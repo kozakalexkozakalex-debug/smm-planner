@@ -6,6 +6,7 @@ import type { Post } from "@/lib/types";
 import Filters from "@/components/posts/Filters";
 import Hotkeys from "@/components/Hotkeys";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
+import Pagination from "@/components/Pagination";
 import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost } from "@/lib/store";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
 import NewPostModal from "@/components/NewPostModal";
@@ -46,6 +47,9 @@ function PostsPageInner() {
   const [debouncedSearch, setDebouncedSearch] = useState<string>(spSearch);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [posts, setPosts] = useState<Post[]>(() => getPosts());
+  const spPageParam = Number(searchParams.get("page") ?? "1");
+  const pageFromUrl = Number.isFinite(spPageParam) && spPageParam > 0 ? spPageParam : 1;
+  const pageSize = 10;
   const [sortKey, setSortKey] = useState<SortKey>(validSort);
   const [sortDir, setSortDir] = useState<SortDir>(validDir);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -109,6 +113,13 @@ function PostsPageInner() {
     return arr;
   }, [filtered, sortKey, sortDir]);
 
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const safePage = Math.min(Math.max(1, pageFromUrl), totalPages);
+  const pagePosts = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    return sorted.slice(start, start + pageSize);
+  }, [sorted, safePage, pageSize]);
+
   function handleSort(key: SortKey) {
     if (key === sortKey) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -125,7 +136,11 @@ function PostsPageInner() {
     setSearch("");
   }
 
+  // No setState here; viewPage resets to 1 when filtersKey changes
+
   // Sync state to URL without navigation
+  const filtersKey = `${channel}|${status}|${debouncedSearch}|${sortKey}|${sortDir}`;
+  const prevFiltersKeyRef = useRef(filtersKey);
   useEffect(() => {
     const params = new URLSearchParams();
     if (channel) params.set("channel", channel);
@@ -133,13 +148,16 @@ function PostsPageInner() {
     if (search) params.set("search", search);
     params.set("sort", sortKey);
     params.set("dir", sortDir);
+    const desiredPage = prevFiltersKeyRef.current !== filtersKey ? 1 : safePage;
+    params.set("page", String(desiredPage));
     const nextQ = params.toString();
     const currQ = typeof window !== "undefined" ? window.location.search.slice(1) : "";
     if (nextQ !== currQ) {
       const path = typeof window !== "undefined" ? window.location.pathname : "/posts";
       router.replace(nextQ ? `${path}?${nextQ}` : path, { scroll: false });
     }
-  }, [channel, status, search, sortKey, sortDir, router]);
+    prevFiltersKeyRef.current = filtersKey;
+  }, [channel, status, search, sortKey, sortDir, safePage, filtersKey, router]);
 
   function handleEdit(p: Post) {
     setEditingId(p.id);
@@ -193,10 +211,20 @@ function PostsPageInner() {
         onSearchChange={setSearch}
         searchRef={searchInputRef}
       />
+      <Pagination
+        page={safePage}
+        totalPages={totalPages}
+        onPageChange={(p) => {
+          const params = new URLSearchParams(searchParams.toString());
+          params.set("page", String(p));
+          const path = typeof window !== "undefined" ? window.location.pathname : "/posts";
+          router.replace(`${path}?${params.toString()}`, { scroll: false });
+        }}
+      />
       <Hotkeys onNew={() => setOpen(true)} onFocusSearch={() => searchInputRef.current?.focus()} />
 
       <PostsTable
-        posts={sorted}
+        posts={pagePosts}
         sortKey={sortKey}
         sortDir={sortDir}
         onSort={handleSort}
@@ -208,6 +236,16 @@ function PostsPageInner() {
         hasActiveFilters={hasActiveFilters}
         onCreate={() => setOpen(true)}
         onClearFilters={hasActiveFilters ? handleClearFilters : undefined}
+      />
+      <Pagination
+        page={safePage}
+        totalPages={totalPages}
+        onPageChange={(p) => {
+          const params = new URLSearchParams(searchParams.toString());
+          params.set("page", String(p));
+          const path = typeof window !== "undefined" ? window.location.pathname : "/posts";
+          router.replace(`${path}?${params.toString()}`, { scroll: false });
+        }}
       />
 
       <NewPostModal
