@@ -2,15 +2,18 @@
 
 import { useMemo, useState } from "react";
 import type { Post } from "@/lib/types";
-import { CHANNELS, STATUSES, addPost } from "@/lib/data";
+import { CHANNELS, STATUSES } from "@/lib/data";
+import { addPost } from "@/lib/store";
+import { toISOFromLocal } from "@/lib/dates";
 
 type Props = {
   open: boolean;
   onClose: () => void;
   onSaved?: () => void;
+  initialLocalDateTime?: string;
 };
 
-export default function NewPostModal({ open, onClose, onSaved }: Props) {
+export default function NewPostModal({ open, onClose, onSaved, initialLocalDateTime }: Props) {
   const [channel, setChannel] = useState<"" | Post["channel"]>("");
   const [dateTime, setDateTime] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -22,8 +25,9 @@ export default function NewPostModal({ open, onClose, onSaved }: Props) {
   const isOpen = open;
 
   const canSave = useMemo(() => {
-    return Boolean(channel && dateTime && title);
-  }, [channel, dateTime, title]);
+    const effectiveDateTime = dateTime || initialLocalDateTime || "";
+    return Boolean(channel && effectiveDateTime && title);
+  }, [channel, dateTime, title, initialLocalDateTime]);
 
   function resetForm() {
     setChannel("");
@@ -47,12 +51,6 @@ export default function NewPostModal({ open, onClose, onSaved }: Props) {
     return Object.keys(next).length === 0;
   }
 
-  function toISO(local: string) {
-    // input[type=datetime-local] yields local time like '2025-11-05T09:00'
-    const d = new Date(local);
-    return d.toISOString();
-  }
-
   function genId() {
     // Prefer UUID if available
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -69,9 +67,10 @@ export default function NewPostModal({ open, onClose, onSaved }: Props) {
     e.preventDefault();
     if (!validate()) return;
 
+    const local = dateTime || initialLocalDateTime || "";
     const newPost: Post = {
       id: genId(),
-      date: toISO(dateTime),
+      date: toISOFromLocal(local),
       channel: channel as Post["channel"],
       title,
       status,
@@ -143,7 +142,7 @@ export default function NewPostModal({ open, onClose, onSaved }: Props) {
             <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Date & Time</label>
             <input
               type="datetime-local"
-              value={dateTime}
+              value={dateTime || initialLocalDateTime || ""}
               onChange={(e) => setDateTime(e.target.value)}
               className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
             />
@@ -197,4 +196,3 @@ export default function NewPostModal({ open, onClose, onSaved }: Props) {
     </div>
   );
 }
-
