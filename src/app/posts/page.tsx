@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { Post } from "@/lib/types";
 import Filters from "@/components/posts/Filters";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
@@ -10,13 +11,39 @@ import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
 import Toast from "@/components/Toast";
 
-export default function PostsPage() {
-  const [channel, setChannel] = useState<string>("");
-  const [status, setStatus] = useState<string>("");
-  const [search, setSearch] = useState<string>("");
+function PostsPageInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const spChannel = searchParams.get("channel") ?? "";
+  const spStatus = searchParams.get("status") ?? "";
+  const spSearch = searchParams.get("search") ?? "";
+  const spSortParam = (searchParams.get("sort") ?? "") as string;
+  const spDirParam = (searchParams.get("dir") ?? "") as string;
+
+  const validChannel = (channelOptions as readonly string[]).includes(spChannel)
+    ? spChannel
+    : "";
+  const validStatus = (statusOptions as readonly string[]).includes(spStatus)
+    ? spStatus
+    : "";
+  const allowedSortKeys: ReadonlyArray<SortKey> = ["date", "channel", "title", "status"];
+  const allowedDirs: ReadonlyArray<SortDir> = ["asc", "desc"];
+  const validSort: SortKey = (allowedSortKeys as readonly string[]).includes(spSortParam)
+    ? (spSortParam as SortKey)
+    : "date";
+  const validDir: SortDir = (allowedDirs as readonly string[]).includes(spDirParam)
+    ? (spDirParam as SortDir)
+    : validSort === "date"
+    ? "desc"
+    : "asc";
+
+  const [channel, setChannel] = useState<string>(validChannel);
+  const [status, setStatus] = useState<string>(validStatus);
+  const [search, setSearch] = useState<string>(spSearch);
   const [posts, setPosts] = useState<Post[]>(() => getPosts());
-  const [sortKey, setSortKey] = useState<SortKey>("date");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortKey, setSortKey] = useState<SortKey>(validSort);
+  const [sortDir, setSortDir] = useState<SortDir>(validDir);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [prefill, setPrefill] = useState<{ local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"] }>({});
   const [open, setOpen] = useState(false);
@@ -68,6 +95,22 @@ export default function PostsPage() {
       setSortDir(key === "date" ? "desc" : "asc");
     }
   }
+
+  // Sync state to URL without navigation
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (channel) params.set("channel", channel);
+    if (status) params.set("status", status);
+    if (search) params.set("search", search);
+    params.set("sort", sortKey);
+    params.set("dir", sortDir);
+    const nextQ = params.toString();
+    const currQ = typeof window !== "undefined" ? window.location.search.slice(1) : "";
+    if (nextQ !== currQ) {
+      const path = typeof window !== "undefined" ? window.location.pathname : "/posts";
+      router.replace(nextQ ? `${path}?${nextQ}` : path, { scroll: false });
+    }
+  }, [channel, status, search, sortKey, sortDir, router]);
 
   function handleEdit(p: Post) {
     setEditingId(p.id);
@@ -154,5 +197,13 @@ export default function PostsPage() {
         }}
       />
     </section>
+  );
+}
+
+export default function PostsPage() {
+  return (
+    <Suspense fallback={null}>
+      <PostsPageInner />
+    </Suspense>
   );
 }
