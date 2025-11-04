@@ -42,6 +42,7 @@ function PostsPageInner() {
   const [channel, setChannel] = useState<string>(validChannel);
   const [status, setStatus] = useState<string>(validStatus);
   const [search, setSearch] = useState<string>(spSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>(spSearch);
   const [posts, setPosts] = useState<Post[]>(() => getPosts());
   const [sortKey, setSortKey] = useState<SortKey>(validSort);
   const [sortDir, setSortDir] = useState<SortDir>(validDir);
@@ -67,15 +68,21 @@ function PostsPageInner() {
     return subscribe(() => setPosts(getPosts()));
   }, []);
 
+  // Debounce title search for smoother filtering
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim().toLowerCase()), 250);
+    return () => clearTimeout(t);
+  }, [search]);
+
   const filtered = useMemo(() => {
-    const term = search.trim().toLowerCase();
+    const term = debouncedSearch;
     return posts.filter((p) => {
       if (channel && p.channel !== channel) return false;
       if (status && p.status !== status) return false;
       if (term && !p.title.toLowerCase().includes(term)) return false;
       return true;
     });
-  }, [channel, status, search, posts]);
+  }, [channel, status, debouncedSearch, posts]);
 
   const sorted = useMemo(() => {
     const arr = [...filtered];
