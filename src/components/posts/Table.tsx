@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Post } from "@/lib/types";
 import { formatDateYMD } from "@/lib/dates";
 import StatusBadge from "@/components/StatusBadge";
@@ -12,9 +13,37 @@ type TableProps = {
   onSort: (key: SortKey) => void;
   onEdit: (post: Post) => void;
   onDelete: (id: string) => void;
+  onUpdateStatus: (id: string, status: Post["status"]) => void;
+  onUpdateTitle: (id: string, title: string) => void;
 };
 
-export default function PostsTable({ posts, sortKey, sortDir, onSort, onEdit, onDelete }: TableProps) {
+export default function PostsTable({
+  posts,
+  sortKey,
+  sortDir,
+  onSort,
+  onEdit,
+  onDelete,
+  onUpdateStatus,
+  onUpdateTitle,
+}: TableProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draftTitle, setDraftTitle] = useState<string>("");
+
+  function startEdit(p: Post) {
+    setEditingId(p.id);
+    setDraftTitle(p.title);
+  }
+  function saveEdit(p: Post) {
+    const next = draftTitle.trim();
+    if (next && next !== p.title) onUpdateTitle(p.id, next);
+    setEditingId(null);
+    setDraftTitle("");
+  }
+  function cancelEdit() {
+    setEditingId(null);
+    setDraftTitle("");
+  }
   function renderHeader(label: string, key: SortKey) {
     const isActive = sortKey === key;
     const arrow = !isActive ? "↕" : sortDir === "asc" ? "▲" : "▼";
@@ -69,9 +98,46 @@ export default function PostsTable({ posts, sortKey, sortDir, onSort, onEdit, on
                   {p.channel}
                 </td>
                 <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">
-                  {p.title}
+                  {editingId === p.id ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        value={draftTitle}
+                        onChange={(e) => setDraftTitle(e.target.value)}
+                        className="h-8 w-full max-w-sm rounded-md border border-zinc-300 bg-white px-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => saveEdit(p)}
+                        className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        onClick={cancelEdit}
+                        className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <span>{p.title}</span>
+                  )}
                 </td>
-                <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200"><StatusBadge status={p.status} /></td>
+                <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={p.status} />
+                    <select
+                      value={p.status}
+                      onChange={(e) => onUpdateStatus(p.id, e.target.value as Post["status"])}
+                      className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                    >
+                      <option value="Draft">Draft</option>
+                      <option value="Scheduled">Scheduled</option>
+                      <option value="Published">Published</option>
+                    </select>
+                  </div>
+                </td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex items-center gap-2">
                     <button
@@ -81,6 +147,15 @@ export default function PostsTable({ posts, sortKey, sortDir, onSort, onEdit, on
                     >
                       Edit
                     </button>
+                    {editingId !== p.id ? (
+                      <button
+                        type="button"
+                        onClick={() => startEdit(p)}
+                        className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                      >
+                        Quick Edit
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => onDelete(p.id)}

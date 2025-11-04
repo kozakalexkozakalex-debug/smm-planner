@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { Post } from "@/lib/types";
 import Filters from "@/components/posts/Filters";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
-import { addPost, deletePost, getPosts, subscribe } from "@/lib/store";
+import { addPost, deletePost, getPosts, subscribe, updatePost } from "@/lib/store";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
 import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
@@ -162,6 +162,8 @@ function PostsPageInner() {
         onSort={handleSort}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onUpdateStatus={(id, status) => updatePost(id, { status })}
+        onUpdateTitle={(id, title) => updatePost(id, { title })}
       />
 
       <NewPostModal
