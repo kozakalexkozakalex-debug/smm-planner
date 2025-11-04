@@ -47,6 +47,23 @@ export function getPosts(): Post[] {
   return posts;
 }
 
+export function setPosts(next: Post[]) {
+  posts = next;
+  saveToStorage(posts);
+  notify();
+}
+
+export function parsePosts(raw: unknown): Post[] | null {
+  try {
+    const arr = Array.isArray(raw) ? raw : JSON.parse(String(raw));
+    if (!Array.isArray(arr)) return null;
+    const cleaned = arr.filter(isPost);
+    return cleaned.length ? (cleaned as Post[]) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function subscribe(fn: Listener): () => void {
   listeners.add(fn);
   return () => {

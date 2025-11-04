@@ -10,6 +10,7 @@ import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/dat
 import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
 import Toast from "@/components/Toast";
+import ImportExport from "@/components/posts/ImportExport";
 
 function PostsPageInner() {
   const router = useRouter();
@@ -49,6 +50,12 @@ function PostsPageInner() {
   const [open, setOpen] = useState(false);
   const [undo, setUndo] = useState<{ show: boolean; post?: Post }>({ show: false });
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [importToast, setImportToast] = useState<string | null>(null);
+  useEffect(() => {
+    if (!importToast) return;
+    const t = setTimeout(() => setImportToast(null), 2000);
+    return () => clearTimeout(t);
+  }, [importToast]);
 
   useEffect(() => {
     return subscribe(() => setPosts(getPosts()));
@@ -142,6 +149,10 @@ function PostsPageInner() {
             Список запланованих і опублікованих постів.
           </p>
         </div>
+        <ImportExport
+          onImported={(n) => setImportToast(`Imported ${n} posts`)}
+          onError={(m) => setImportToast(m)}
+        />
       </header>
 
       <Filters
@@ -198,6 +209,7 @@ function PostsPageInner() {
           setUndo({ show: false, post: undefined });
         }}
       />
+      <Toast show={!!importToast} message={importToast ?? ""} />
     </section>
   );
 }
