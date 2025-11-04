@@ -24,14 +24,15 @@ export type DayCell = {
   inCurrentMonth: boolean;
 };
 
-export function buildMonthGrid(anchor: Date): DayCell[] {
+export function buildMonthGrid(anchor: Date, weekStart: 0 | 1 = 1): DayCell[] {
   const year = anchor.getFullYear();
   const month = anchor.getMonth(); // 0-11
   const firstOfMonth = new Date(year, month, 1);
   const start = new Date(firstOfMonth);
-  // Move to previous Sunday (0)
-  const startDay = start.getDay();
-  start.setDate(start.getDate() - startDay);
+  // Align to week start (0 = Sunday, 1 = Monday)
+  const dow = start.getDay();
+  const shift = (dow - weekStart + 7) % 7;
+  start.setDate(start.getDate() - shift);
   const cells: DayCell[] = [];
   for (let i = 0; i < 42; i++) {
     const d = new Date(start);

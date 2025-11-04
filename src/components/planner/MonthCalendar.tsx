@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { getPosts, subscribe } from "@/lib/store";
 import { buildMonthGrid, monthLabel } from "@/lib/dates";
+import type { Post } from "@/lib/types";
 
 type Props = {
   onSelectDate?: (ymd: string) => void;
@@ -13,11 +14,13 @@ export default function MonthCalendar({ onSelectDate }: Props) {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
-  const [counts, setCounts] = useState<Map<string, number>>(new Map());
+  const [counts, setCounts] = useState<Map<string, { Draft: number; Scheduled: number; Published: number }>>(
+    new Map(),
+  );
 
   useEffect(() => {
     const compute = () => {
-      const map = new Map<string, number>();
+      const map = new Map<string, { Draft: number; Scheduled: number; Published: number }>();
       for (const p of getPosts()) {
         const d = new Date(p.date);
         if (Number.isNaN(d.getTime())) continue;
@@ -25,7 +28,9 @@ export default function MonthCalendar({ onSelectDate }: Props) {
         const m = String(d.getMonth() + 1).padStart(2, "0");
         const day = String(d.getDate()).padStart(2, "0");
         const ymd = `${y}-${m}-${day}`;
-        map.set(ymd, (map.get(ymd) ?? 0) + 1);
+        const bucket = map.get(ymd) ?? { Draft: 0, Scheduled: 0, Published: 0 };
+        bucket[p.status as Post["status"]] += 1;
+        map.set(ymd, bucket);
       }
       setCounts(map);
     };
@@ -33,7 +38,7 @@ export default function MonthCalendar({ onSelectDate }: Props) {
     return subscribe(compute);
   }, []);
 
-  const cells = useMemo(() => buildMonthGrid(anchor), [anchor]);
+  const cells = useMemo(() => buildMonthGrid(anchor, 1), [anchor]);
 
   function prevMonth() {
     setAnchor((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
@@ -66,17 +71,18 @@ export default function MonthCalendar({ onSelectDate }: Props) {
         </button>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-xs text-zinc-500 dark:text-zinc-400">
-        <div>Sun</div>
         <div>Mon</div>
         <div>Tue</div>
         <div>Wed</div>
         <div>Thu</div>
         <div>Fri</div>
         <div>Sat</div>
+        <div>Sun</div>
       </div>
       <div className="mt-2 grid grid-cols-7 gap-1">
         {cells.map((c, idx) => {
-          const count = counts.get(c.ymd) ?? 0;
+          const bucket = counts.get(c.ymd) ?? { Draft: 0, Scheduled: 0, Published: 0 };
+          const total = bucket.Draft + bucket.Scheduled + bucket.Published;
           const muted = c.inCurrentMonth ? "" : "opacity-40";
           return (
             <button
@@ -88,14 +94,32 @@ export default function MonthCalendar({ onSelectDate }: Props) {
               <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                 {c.date.getDate()}
               </div>
-              {count > 0 && (
-                <div className="mt-2 inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
-                  {count} post{count > 1 ? "s" : ""}
-                </div>
-              )}
+              <div className="mt-2 flex items-center gap-1">
+                {bucket.Draft > 0 && <span className="h-2 w-2 rounded-full bg-zinc-400" aria-label="Draft" />}
+                {bucket.Scheduled > 0 && (
+                  <span className="h-2 w-2 rounded-full bg-amber-500" aria-label="Scheduled" />
+                )}
+                {bucket.Published > 0 && (
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" aria-label="Published" />
+                )}
+                {total > 0 && (
+                  <span className="ml-1 text-[10px] text-zinc-500 dark:text-zinc-400">{total}</span>
+                )}
+              </div>
             </button>
           );
         })}
+      </div>
+      <div className="mt-3 flex items-center gap-3 text-[10px] text-zinc-500 dark:text-zinc-400">
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-zinc-400" /> Draft
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-amber-500" /> Scheduled
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" /> Published
+        </span>
       </div>
     </div>
   );
