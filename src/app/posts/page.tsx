@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { Post } from "@/lib/types";
 import Filters from "@/components/posts/Filters";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
-import { addPost, deletePost, getPosts, subscribe, updatePost } from "@/lib/store";
+import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost } from "@/lib/store";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
 import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
@@ -51,11 +51,17 @@ function PostsPageInner() {
   const [undo, setUndo] = useState<{ show: boolean; post?: Post }>({ show: false });
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [importToast, setImportToast] = useState<string | null>(null);
+  const [dupToast, setDupToast] = useState(false);
   useEffect(() => {
     if (!importToast) return;
     const t = setTimeout(() => setImportToast(null), 2000);
     return () => clearTimeout(t);
   }, [importToast]);
+  useEffect(() => {
+    if (!dupToast) return;
+    const t = setTimeout(() => setDupToast(false), 1500);
+    return () => clearTimeout(t);
+  }, [dupToast]);
 
   useEffect(() => {
     return subscribe(() => setPosts(getPosts()));
@@ -140,6 +146,11 @@ function PostsPageInner() {
     }
   }
 
+  function handleDuplicate(id: string) {
+    const clone = duplicatePost(id);
+    if (clone) setDupToast(true);
+  }
+
   return (
     <section className="space-y-6">
       <header className="flex items-end justify-between">
@@ -175,6 +186,7 @@ function PostsPageInner() {
         onDelete={handleDelete}
         onUpdateStatus={(id, status) => updatePost(id, { status })}
         onUpdateTitle={(id, title) => updatePost(id, { title })}
+        onDuplicate={handleDuplicate}
       />
 
       <NewPostModal
@@ -210,6 +222,7 @@ function PostsPageInner() {
         }}
       />
       <Toast show={!!importToast} message={importToast ?? ""} />
+      <Toast show={dupToast} message="Duplicated" />
     </section>
   );
 }

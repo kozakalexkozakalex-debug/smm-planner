@@ -101,3 +101,25 @@ export function deletePost(id: string): Post | null {
   notify();
   return removed ?? null;
 }
+
+function generateId(): string {
+  // Prefer crypto.randomUUID if available
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).slice(2);
+}
+
+export function duplicatePost(id: string): Post | null {
+  const src = posts.find((p) => p.id === id);
+  if (!src) return null;
+  const clone: Post = { ...src, id: generateId() };
+  posts = [clone, ...posts];
+  saveToStorage(posts);
+  notify();
+  return clone;
+}

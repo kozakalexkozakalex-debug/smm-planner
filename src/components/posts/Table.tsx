@@ -15,6 +15,7 @@ type TableProps = {
   onDelete: (id: string) => void;
   onUpdateStatus: (id: string, status: Post["status"]) => void;
   onUpdateTitle: (id: string, title: string) => void;
+  onDuplicate: (id: string) => void;
 };
 
 export default function PostsTable({
@@ -26,6 +27,7 @@ export default function PostsTable({
   onDelete,
   onUpdateStatus,
   onUpdateTitle,
+  onDuplicate,
 }: TableProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState<string>("");
@@ -156,6 +158,13 @@ export default function PostsTable({
                         Quick Edit
                       </button>
                     ) : null}
+                    <button
+                      type="button"
+                      onClick={() => onDuplicate(p.id)}
+                      className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                    >
+                      Duplicate
+                    </button>
                     <button
                       type="button"
                       onClick={() => onDelete(p.id)}
