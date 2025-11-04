@@ -5,10 +5,15 @@ import NewPostModal from "@/components/NewPostModal";
 import Toast from "@/components/Toast";
 import MonthCalendar from "@/components/planner/MonthCalendar";
 import { toLocalInputFromYMD } from "@/lib/dates";
+import DayPostsModal from "@/components/planner/DayPostsModal";
+import type { Post } from "@/lib/types";
+import { deletePost } from "@/lib/store";
 
 export default function PlannerDashboard() {
   const [open, setOpen] = useState(false);
   const [prefillLocal, setPrefillLocal] = useState<string>("");
+  const [dayYmd, setDayYmd] = useState<string | null>(null);
+  const [editing, setEditing] = useState<{ id: string; local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"] } | null>(null);
   const [savedToast, setSavedToast] = useState(false);
 
   useEffect(() => {
@@ -35,19 +40,37 @@ export default function PlannerDashboard() {
       </div>
 
       <div className="rounded-lg border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
-        <MonthCalendar
-          onSelectDate={(ymd) => {
-            setPrefillLocal(toLocalInputFromYMD(ymd, 9, 0));
-            setOpen(true);
-          }}
-        />
+        <MonthCalendar onSelectDate={(ymd) => setDayYmd(ymd)} />
       </div>
+
+      <DayPostsModal
+        open={!!dayYmd}
+        ymd={dayYmd}
+        onClose={() => setDayYmd(null)}
+        onNewForDay={(ymd) => {
+          setPrefillLocal(toLocalInputFromYMD(ymd, 9, 0));
+          setDayYmd(null);
+          setEditing(null);
+          setOpen(true);
+        }}
+        onEdit={(p) => {
+          const local = `${p.date.substring(0, 10)}T${new Date(p.date).toTimeString().slice(0, 5)}`;
+          setEditing({ id: p.id, local, channel: p.channel, title: p.title, status: p.status });
+          setDayYmd(null);
+          setOpen(true);
+        }}
+        onDelete={(id) => deletePost(id)}
+      />
 
       <NewPostModal
         open={open}
         onClose={() => setOpen(false)}
         onSaved={() => setSavedToast(true)}
-        initialLocalDateTime={prefillLocal || undefined}
+        initialLocalDateTime={editing?.local || prefillLocal || undefined}
+        editingPostId={editing?.id}
+        initialChannel={editing?.channel}
+        initialTitle={editing?.title}
+        initialStatus={editing?.status}
       />
       <Toast show={savedToast} message="Saved" />
     </section>

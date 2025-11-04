@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Post } from "@/lib/types";
 import { CHANNELS, STATUSES } from "@/lib/data";
-import { addPost } from "@/lib/store";
+import { addPost, updatePost } from "@/lib/store";
 import { toISOFromLocal } from "@/lib/dates";
 
 type Props = {
@@ -11,14 +11,27 @@ type Props = {
   onClose: () => void;
   onSaved?: () => void;
   initialLocalDateTime?: string;
+  editingPostId?: string;
+  initialChannel?: Post["channel"];
+  initialTitle?: string;
+  initialStatus?: Post["status"];
 };
 
-export default function NewPostModal({ open, onClose, onSaved, initialLocalDateTime }: Props) {
+export default function NewPostModal({
+  open,
+  onClose,
+  onSaved,
+  initialLocalDateTime,
+  editingPostId,
+  initialChannel,
+  initialTitle,
+  initialStatus,
+}: Props) {
   const [channel, setChannel] = useState<"" | Post["channel"]>("");
   const [dateTime, setDateTime] = useState<string>("");
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
-  const [status, setStatus] = useState<Post["status"]>("Draft");
+  const [status, setStatus] = useState<Post["status"]>(initialStatus ?? "Draft");
 
   const [errors, setErrors] = useState<{ channel?: string; dateTime?: string; title?: string }>({});
 
@@ -26,8 +39,10 @@ export default function NewPostModal({ open, onClose, onSaved, initialLocalDateT
 
   const canSave = useMemo(() => {
     const effectiveDateTime = dateTime || initialLocalDateTime || "";
-    return Boolean(channel && effectiveDateTime && title);
-  }, [channel, dateTime, title, initialLocalDateTime]);
+    const effectiveChannel = channel || initialChannel || "";
+    const effectiveTitle = title || initialTitle || "";
+    return Boolean(effectiveChannel && effectiveDateTime && effectiveTitle);
+  }, [channel, dateTime, title, initialLocalDateTime, initialChannel, initialTitle]);
 
   function resetForm() {
     setChannel("");
@@ -44,9 +59,9 @@ export default function NewPostModal({ open, onClose, onSaved, initialLocalDateT
 
   function validate() {
     const next: typeof errors = {};
-    if (!channel) next.channel = "Required";
-    if (!dateTime) next.dateTime = "Required";
-    if (!title) next.title = "Required";
+    if (!(channel || initialChannel)) next.channel = "Required";
+    if (!(dateTime || initialLocalDateTime)) next.dateTime = "Required";
+    if (!(title || initialTitle)) next.title = "Required";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -68,15 +83,27 @@ export default function NewPostModal({ open, onClose, onSaved, initialLocalDateT
     if (!validate()) return;
 
     const local = dateTime || initialLocalDateTime || "";
-    const newPost: Post = {
-      id: genId(),
-      date: toISOFromLocal(local),
-      channel: channel as Post["channel"],
-      title,
-      status,
-    };
+    const nextDate = toISOFromLocal(local);
+    const nextChannel = (channel || initialChannel) as Post["channel"];
+    const nextTitle = title || (initialTitle ?? "");
 
-    addPost(newPost);
+    if (editingPostId) {
+      updatePost(editingPostId, {
+        date: nextDate,
+        channel: nextChannel,
+        title: nextTitle,
+        status,
+      });
+    } else {
+      const newPost: Post = {
+        id: genId(),
+        date: nextDate,
+        channel: nextChannel,
+        title: nextTitle,
+        status,
+      };
+      addPost(newPost);
+    }
     onSaved?.();
     resetForm();
     close();
@@ -97,7 +124,7 @@ export default function NewPostModal({ open, onClose, onSaved, initialLocalDateT
         className="relative z-10 w-[92vw] max-w-lg rounded-lg border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:p-6"
       >
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">New Post</h2>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{editingPostId ? "Edit Post" : "New Post"}</h2>
           <p className="text-sm text-zinc-600 dark:text-zinc-400">Fill in the details below.</p>
         </div>
 
@@ -106,7 +133,7 @@ export default function NewPostModal({ open, onClose, onSaved, initialLocalDateT
             <div className="flex flex-col">
               <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Channel</label>
               <select
-                value={channel}
+                value={channel || initialChannel || ""}
                 onChange={(e) => setChannel(e.target.value as Post["channel"] | "")}
                 className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
               >
@@ -154,7 +181,7 @@ export default function NewPostModal({ open, onClose, onSaved, initialLocalDateT
           <div className="flex flex-col">
             <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Title</label>
             <input
-              value={title}
+              value={title || initialTitle || ""}
               onChange={(e) => setTitle(e.target.value)}
               className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
               placeholder="Post title…"

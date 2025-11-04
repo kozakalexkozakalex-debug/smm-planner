@@ -10,9 +10,11 @@ type TableProps = {
   sortKey: SortKey;
   sortDir: SortDir;
   onSort: (key: SortKey) => void;
+  onEdit: (post: Post) => void;
+  onDelete: (id: string) => void;
 };
 
-export default function PostsTable({ posts, sortKey, sortDir, onSort }: TableProps) {
+export default function PostsTable({ posts, sortKey, sortDir, onSort, onEdit, onDelete }: TableProps) {
   function renderHeader(label: string, key: SortKey) {
     const isActive = sortKey === key;
     const arrow = !isActive ? "↕" : sortDir === "asc" ? "▲" : "▼";
@@ -46,6 +48,7 @@ export default function PostsTable({ posts, sortKey, sortDir, onSort }: TablePro
             <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
               {renderHeader("Status", "status")}
             </th>
+            <th className="px-4 py-3 text-right font-medium text-zinc-600 dark:text-zinc-400">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -69,6 +72,24 @@ export default function PostsTable({ posts, sortKey, sortDir, onSort }: TablePro
                   {p.title}
                 </td>
                 <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200"><StatusBadge status={p.status} /></td>
+                <td className="px-4 py-3 text-right">
+                  <div className="inline-flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(p)}
+                      className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(p.id)}
+                      className="rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
               </tr>
             ))
           )}
