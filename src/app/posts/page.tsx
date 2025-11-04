@@ -118,6 +118,13 @@ function PostsPageInner() {
     }
   }
 
+  const hasActiveFilters = Boolean(channel || status || debouncedSearch);
+  function handleClearFilters() {
+    setChannel("");
+    setStatus("");
+    setSearch("");
+  }
+
   // Sync state to URL without navigation
   useEffect(() => {
     const params = new URLSearchParams();
@@ -198,6 +205,9 @@ function PostsPageInner() {
         onUpdateStatus={(id, status) => updatePost(id, { status })}
         onUpdateTitle={(id, title) => updatePost(id, { title })}
         onDuplicate={handleDuplicate}
+        hasActiveFilters={hasActiveFilters}
+        onCreate={() => setOpen(true)}
+        onClearFilters={hasActiveFilters ? handleClearFilters : undefined}
       />
 
       <NewPostModal

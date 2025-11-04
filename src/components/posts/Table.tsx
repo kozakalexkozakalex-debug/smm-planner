@@ -16,6 +16,9 @@ type TableProps = {
   onUpdateStatus: (id: string, status: Post["status"]) => void;
   onUpdateTitle: (id: string, title: string) => void;
   onDuplicate: (id: string) => void;
+  hasActiveFilters: boolean;
+  onCreate: () => void;
+  onClearFilters?: () => void;
 };
 
 export default function PostsTable({
@@ -28,6 +31,9 @@ export default function PostsTable({
   onUpdateStatus,
   onUpdateTitle,
   onDuplicate,
+  hasActiveFilters,
+  onCreate,
+  onClearFilters,
 }: TableProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState<string>("");
@@ -85,11 +91,30 @@ export default function PostsTable({
         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
           {posts.length === 0 ? (
             <tr>
-              <td
-                className="px-4 py-6 text-center text-zinc-500 dark:text-zinc-400"
-                colSpan={4}
-              >
-                No posts match your filters.
+              <td className="px-4 py-10 text-center" colSpan={5}>
+                <div className="mx-auto max-w-md space-y-3">
+                  <div className="text-sm text-zinc-600 dark:text-zinc-400">
+                    {hasActiveFilters ? "No posts match your filters." : "No posts yet."}
+                  </div>
+                  <div className="flex justify-center gap-2">
+                    {hasActiveFilters && (
+                      <button
+                        type="button"
+                        onClick={onClearFilters}
+                        className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+                      >
+                        Clear filters
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={onCreate}
+                      className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                    >
+                      {hasActiveFilters ? "New Post" : "Create a post"}
+                    </button>
+                  </div>
+                </div>
               </td>
             </tr>
           ) : (
