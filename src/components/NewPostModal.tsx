@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import type { Post } from "@/lib/types";
 import { CHANNELS, STATUSES } from "@/lib/data";
 import { addPost, updatePost } from "@/lib/store";
@@ -27,6 +27,8 @@ export default function NewPostModal({
   initialTitle,
   initialStatus,
 }: Props) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const lastActiveRef = useRef<HTMLElement | null>(null);
   const [channel, setChannel] = useState<"" | Post["channel"]>("");
   const [dateTime, setDateTime] = useState<string>("");
   const [title, setTitle] = useState<string>("");
@@ -54,7 +56,12 @@ export default function NewPostModal({
   }
 
   function close() {
+    // restore focus to the element that was focused before opening
+    const last = lastActiveRef.current;
     onClose();
+    if (last) {
+      queueMicrotask(() => last.focus());
+    }
   }
 
   function validate() {
@@ -109,10 +116,57 @@ export default function NewPostModal({
     close();
   }
 
+  function getFocusable(): HTMLElement[] {
+    const root = containerRef.current;
+    if (!root) return [];
+    const nodes = root.querySelectorAll<HTMLElement>(
+      'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    return Array.from(nodes).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      close();
+      return;
+    }
+    if (e.key === "Tab") {
+      const focusables = getFocusable();
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (active === first || !focusables.includes(active as HTMLElement)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (active === last || !focusables.includes(active as HTMLElement)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  }
+
+  useEffect(() => {
+    // save last focused element and focus first field on open
+    if (isOpen) {
+      lastActiveRef.current = document.activeElement as HTMLElement | null;
+      const focusables = getFocusable();
+      if (focusables.length) {
+        focusables[0].focus();
+      }
+    }
+    // no cleanup needed; focus restored in close()
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onKeyDown={handleKeyDown}>
       <div
         className="absolute inset-0 bg-black/40"
         onClick={close}
@@ -121,11 +175,14 @@ export default function NewPostModal({
       <div
         role="dialog"
         aria-modal="true"
+        aria-labelledby="newpost-title"
+        aria-describedby="newpost-desc"
+        ref={containerRef}
         className="relative z-10 w-[92vw] max-w-lg rounded-lg border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:p-6"
       >
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{editingPostId ? "Edit Post" : "New Post"}</h2>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">Fill in the details below.</p>
+          <h2 id="newpost-title" className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{editingPostId ? "Edit Post" : "New Post"}</h2>
+          <p id="newpost-desc" className="text-sm text-zinc-600 dark:text-zinc-400">Fill in the details below.</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">

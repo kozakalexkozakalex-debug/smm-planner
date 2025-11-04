@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Post } from "@/lib/types";
 import { getPosts, subscribe } from "@/lib/store";
 import StatusBadge from "@/components/StatusBadge";
@@ -16,6 +16,8 @@ type Props = {
 
 export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, onNewForDay }: Props) {
   const [posts, setPosts] = useState<Post[]>(() => getPosts());
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const newBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     return subscribe(() => setPosts(getPosts()));
@@ -26,17 +28,65 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
     return posts.filter((p) => p.date.startsWith(ymd));
   }, [posts, ymd]);
 
+  useEffect(() => {
+    if (open) {
+      if (newBtnRef.current) newBtnRef.current.focus();
+    }
+  }, [open]);
+
+  function getFocusable(): HTMLElement[] {
+    const root = containerRef.current;
+    if (!root) return [];
+    const nodes = root.querySelectorAll<HTMLElement>(
+      'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    return Array.from(nodes).filter((el) => !el.hasAttribute("disabled") && el.tabIndex !== -1);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      onClose();
+      return;
+    }
+    if (e.key === "Tab") {
+      const focusables = getFocusable();
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (active === first || !focusables.includes(active as HTMLElement)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (active === last || !focusables.includes(active as HTMLElement)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  }
+
   if (!open || !ymd) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onKeyDown={handleKeyDown}>
       <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
-      <div className="relative z-10 w-[92vw] max-w-xl rounded-lg border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:p-6">
+      <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dayposts-title"
+        className="relative z-10 w-[92vw] max-w-xl rounded-lg border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:p-6"
+      >
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{ymd}</h3>
+          <h3 id="dayposts-title" className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{ymd}</h3>
           <button
             type="button"
             onClick={() => onNewForDay(ymd)}
+            ref={newBtnRef}
             className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             New Post
@@ -76,4 +126,3 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
     </div>
   );
 }
-
