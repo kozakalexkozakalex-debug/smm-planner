@@ -9,6 +9,7 @@ type FiltersProps = {
   onChannelChange: (value: string) => void;
   onStatusChange: (value: string) => void;
   onSearchChange: (value: string) => void;
+  searchRef?: React.Ref<HTMLInputElement>;
 };
 
 export default function Filters({
@@ -20,6 +21,7 @@ export default function Filters({
   onChannelChange,
   onStatusChange,
   onSearchChange,
+  searchRef,
 }: FiltersProps) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -64,6 +66,7 @@ export default function Filters({
           Title
         </label>
         <input
+          ref={searchRef}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search title…"

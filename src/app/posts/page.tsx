@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Post } from "@/lib/types";
 import Filters from "@/components/posts/Filters";
+import Hotkeys from "@/components/Hotkeys";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
 import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost } from "@/lib/store";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
@@ -43,6 +44,7 @@ function PostsPageInner() {
   const [status, setStatus] = useState<string>(validStatus);
   const [search, setSearch] = useState<string>(spSearch);
   const [debouncedSearch, setDebouncedSearch] = useState<string>(spSearch);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [posts, setPosts] = useState<Post[]>(() => getPosts());
   const [sortKey, setSortKey] = useState<SortKey>(validSort);
   const [sortDir, setSortDir] = useState<SortDir>(validDir);
@@ -182,7 +184,9 @@ function PostsPageInner() {
         onChannelChange={setChannel}
         onStatusChange={setStatus}
         onSearchChange={setSearch}
+        searchRef={searchInputRef}
       />
+      <Hotkeys onNew={() => setOpen(true)} onFocusSearch={() => searchInputRef.current?.focus()} />
 
       <PostsTable
         posts={sorted}

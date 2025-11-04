@@ -8,6 +8,7 @@ import { toLocalInputFromYMD } from "@/lib/dates";
 import DayPostsModal from "@/components/planner/DayPostsModal";
 import type { Post } from "@/lib/types";
 import { addPost, deletePost } from "@/lib/store";
+import Hotkeys from "@/components/Hotkeys";
 
 export default function PlannerDashboard() {
   const [open, setOpen] = useState(false);
@@ -82,6 +83,7 @@ export default function PlannerDashboard() {
         initialTitle={editing?.title}
         initialStatus={editing?.status}
       />
+      <Hotkeys onNew={() => setOpen(true)} />
       <Toast show={savedToast} message="Saved" />
       <Toast
         show={undo.show}
