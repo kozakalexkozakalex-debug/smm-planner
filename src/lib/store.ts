@@ -76,8 +76,11 @@ export function updatePost(id: string, fields: Partial<Post>) {
   notify();
 }
 
-export function deletePost(id: string) {
-  posts = posts.filter((p) => p.id !== id);
+export function deletePost(id: string): Post | null {
+  const idx = posts.findIndex((p) => p.id === id);
+  if (idx === -1) return null;
+  const [removed] = posts.splice(idx, 1);
   saveToStorage(posts);
   notify();
+  return removed ?? null;
 }

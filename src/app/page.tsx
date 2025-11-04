@@ -1,19 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import NewPostModal from "@/components/NewPostModal";
 import Toast from "@/components/Toast";
 import MonthCalendar from "@/components/planner/MonthCalendar";
 import { toLocalInputFromYMD } from "@/lib/dates";
 import DayPostsModal from "@/components/planner/DayPostsModal";
 import type { Post } from "@/lib/types";
-import { deletePost } from "@/lib/store";
+import { addPost, deletePost } from "@/lib/store";
 
 export default function PlannerDashboard() {
   const [open, setOpen] = useState(false);
   const [prefillLocal, setPrefillLocal] = useState<string>("");
   const [dayYmd, setDayYmd] = useState<string | null>(null);
   const [editing, setEditing] = useState<{ id: string; local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"] } | null>(null);
+  const [undo, setUndo] = useState<{ show: boolean; post?: Post }>({ show: false });
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [savedToast, setSavedToast] = useState(false);
 
   useEffect(() => {
@@ -59,7 +61,15 @@ export default function PlannerDashboard() {
           setDayYmd(null);
           setOpen(true);
         }}
-        onDelete={(id) => deletePost(id)}
+        onDelete={(id) => {
+          if (!confirm("Delete this post?")) return;
+          const removed = deletePost(id);
+          if (removed) {
+            setUndo({ show: true, post: removed });
+            if (undoTimer.current) clearTimeout(undoTimer.current);
+            undoTimer.current = setTimeout(() => setUndo({ show: false, post: undefined }), 5000);
+          }
+        }}
       />
 
       <NewPostModal
@@ -73,6 +83,19 @@ export default function PlannerDashboard() {
         initialStatus={editing?.status}
       />
       <Toast show={savedToast} message="Saved" />
+      <Toast
+        show={undo.show}
+        message="Deleted"
+        actionLabel="Undo"
+        onAction={() => {
+          if (undoTimer.current) {
+            clearTimeout(undoTimer.current);
+            undoTimer.current = null;
+          }
+          if (undo.post) addPost(undo.post);
+          setUndo({ show: false, post: undefined });
+        }}
+      />
     </section>
   );
 }

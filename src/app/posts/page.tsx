@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Post } from "@/lib/types";
 import Filters from "@/components/posts/Filters";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
-import { getPosts, subscribe } from "@/lib/store";
+import { addPost, deletePost, getPosts, subscribe } from "@/lib/store";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
 import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
-import { deletePost } from "@/lib/store";
+import Toast from "@/components/Toast";
 
 export default function PostsPage() {
   const [channel, setChannel] = useState<string>("");
@@ -20,6 +20,8 @@ export default function PostsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [prefill, setPrefill] = useState<{ local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"] }>({});
   const [open, setOpen] = useState(false);
+  const [undo, setUndo] = useState<{ show: boolean; post?: Post }>({ show: false });
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return subscribe(() => setPosts(getPosts()));
@@ -79,7 +81,13 @@ export default function PostsPage() {
   }
 
   function handleDelete(id: string) {
-    deletePost(id);
+    if (!confirm("Delete this post?")) return;
+    const removed = deletePost(id);
+    if (removed) {
+      setUndo({ show: true, post: removed });
+      if (undoTimer.current) clearTimeout(undoTimer.current);
+      undoTimer.current = setTimeout(() => setUndo({ show: false, post: undefined }), 5000);
+    }
   }
 
   return (
@@ -130,6 +138,20 @@ export default function PostsPage() {
         initialChannel={prefill.channel}
         initialTitle={prefill.title}
         initialStatus={prefill.status}
+      />
+
+      <Toast
+        show={undo.show}
+        message="Deleted"
+        actionLabel="Undo"
+        onAction={() => {
+          if (undoTimer.current) {
+            clearTimeout(undoTimer.current);
+            undoTimer.current = null;
+          }
+          if (undo.post) addPost(undo.post);
+          setUndo({ show: false, post: undefined });
+        }}
       />
     </section>
   );
