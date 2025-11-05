@@ -1,6 +1,6 @@
 "use client";
 
-import { getChannels, parseChannels, setChannels } from "@/lib/channels";
+import { getChannels, parseChannels, setChannels } from "@/lib/channelsBoundary";
 import { t } from "@/lib/i18n";
 
 type Props = {

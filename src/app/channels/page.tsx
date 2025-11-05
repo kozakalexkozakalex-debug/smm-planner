@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Toast from "@/components/Toast";
 import ImportExportChannels from "@/components/channels/ImportExportChannels";
-import { addChannel, deleteChannel, getChannels, subscribeChannels, updateChannel } from "@/lib/channels";
+import { addChannel, deleteChannel, getChannels, subscribeChannels, updateChannel } from "@/lib/channelsBoundary";
 import type { Channel } from "@/lib/types";
 import { t } from "@/lib/i18n";
 
