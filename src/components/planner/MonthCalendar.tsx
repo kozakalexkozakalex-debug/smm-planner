@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { getPosts, subscribe } from "@/lib/posts";
@@ -58,7 +58,7 @@ export default function MonthCalendar({ onSelectDate }: Props) {
           className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
           aria-label="Previous month"
         >
-          9
+          ←
         </button>
         <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
           {monthLabel(anchor)}
@@ -69,7 +69,7 @@ export default function MonthCalendar({ onSelectDate }: Props) {
           className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
           aria-label="Next month"
         >
-          8
+          →
         </button>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-xs text-zinc-500 dark:text-zinc-400">
@@ -126,3 +126,4 @@ export default function MonthCalendar({ onSelectDate }: Props) {
     </div>
   );
 }
+
