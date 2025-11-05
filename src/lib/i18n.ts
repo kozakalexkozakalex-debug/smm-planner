@@ -67,7 +67,10 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     // Import/Export
     "importExport.exportJson": "Export JSON",
     "importExport.importJson": "Import JSON",
+    "importExport.exportCsv": "Export CSV",
+    "importExport.importCsv": "Import CSV",
     "importExport.invalidFile": "Invalid file format",
+    "importExport.invalidCsv": "Invalid CSV (check headers and values)",
     "importExport.readError": "Failed to read file",
 
     // Channels confirm
@@ -169,7 +172,10 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     // Import/Export
     "importExport.exportJson": "Експорт JSON",
     "importExport.importJson": "Імпорт JSON",
+    "importExport.exportCsv": "Експорт CSV",
+    "importExport.importCsv": "Імпорт CSV",
     "importExport.invalidFile": "Неправильний формат файлу",
+    "importExport.invalidCsv": "Неправильний CSV (перевірте заголовки та значення)",
     "importExport.readError": "Не вдалося прочитати файл",
 
     // Channels confirm
@@ -249,4 +255,3 @@ export function t(key: string): string {
   const dict = MESSAGES[currentLocale] ?? MESSAGES.en;
   return dict[key] ?? MESSAGES.en[key] ?? key;
 }
-
