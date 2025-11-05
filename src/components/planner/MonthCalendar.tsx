@@ -1,8 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getPosts, subscribe } from "@/lib/store";
-import { buildMonthGrid, monthLabel } from "@/lib/dates";
+import { getPosts, subscribe } from "@/lib/posts";
+import { buildMonthGrid, monthLabel, formatDateYMD } from "@/lib/dates";
+import { getSettings, subscribeSettings } from "@/lib/settings";
 import type { Post } from "@/lib/types";
 
 type Props = {
@@ -14,20 +15,16 @@ export default function MonthCalendar({ onSelectDate }: Props) {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
-  const [counts, setCounts] = useState<Map<string, { Draft: number; Scheduled: number; Published: number }>>(
-    new Map(),
-  );
+  const [counts, setCounts] = useState<Map<string, { Draft: number; Scheduled: number; Published: number }>>(new Map());
+  const [timezone, setTimezone] = useState<string>(() => getSettings().timezone);
 
   useEffect(() => {
     const compute = () => {
       const map = new Map<string, { Draft: number; Scheduled: number; Published: number }>();
+      const tz = timezone || undefined;
       for (const p of getPosts()) {
-        const d = new Date(p.date);
-        if (Number.isNaN(d.getTime())) continue;
-        const y = d.getFullYear();
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        const ymd = `${y}-${m}-${day}`;
+        const ymd = formatDateYMD(p.date, tz);
+        if (!ymd) continue;
         const bucket = map.get(ymd) ?? { Draft: 0, Scheduled: 0, Published: 0 };
         bucket[p.status as Post["status"]] += 1;
         map.set(ymd, bucket);
@@ -35,8 +32,13 @@ export default function MonthCalendar({ onSelectDate }: Props) {
       setCounts(map);
     };
     compute();
-    return subscribe(compute);
-  }, []);
+    const unsubPosts = subscribe(compute);
+    const unsubSettings = subscribeSettings(() => setTimezone(getSettings().timezone));
+    return () => {
+      unsubPosts();
+      unsubSettings();
+    };
+  }, [timezone]);
 
   const cells = useMemo(() => buildMonthGrid(anchor, 1), [anchor]);
 
@@ -56,7 +58,7 @@ export default function MonthCalendar({ onSelectDate }: Props) {
           className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
           aria-label="Previous month"
         >
-          ‹
+          9
         </button>
         <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
           {monthLabel(anchor)}
@@ -67,7 +69,7 @@ export default function MonthCalendar({ onSelectDate }: Props) {
           className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
           aria-label="Next month"
         >
-          ›
+          8
         </button>
       </div>
       <div className="grid grid-cols-7 gap-1 text-center text-xs text-zinc-500 dark:text-zinc-400">

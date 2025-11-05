@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Post } from "@/lib/types";
-import { getPosts, subscribe, updatePost } from "@/lib/store";
+import { getPosts, subscribe, updatePost } from "@/lib/posts";
 import { getSettings, subscribeSettings } from "@/lib/settings";
-import { toISOFromLocal } from "@/lib/dates";
+import { toISOFromLocal, formatTimeHM, formatDateYMD } from "@/lib/dates";
 import Toast from "@/components/Toast";
 import StatusBadge from "@/components/StatusBadge";
 import ChannelBadge from "@/components/ChannelBadge";
@@ -43,8 +43,9 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
 
   const list = useMemo(() => {
     if (!ymd) return [] as Post[];
-    return posts.filter((p) => p.date.startsWith(ymd));
-  }, [posts, ymd]);
+    const tz = timezone || undefined;
+    return posts.filter((p) => formatDateYMD(p.date, tz) === ymd);
+  }, [posts, ymd, timezone]);
 
   useEffect(() => {
     if (open) {
@@ -129,7 +130,8 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
                       const droppedId = e.dataTransfer.getData("text/post-id");
                       if (droppedId) {
                         const local = `${ymd}T${label}`;
-                        updatePost(droppedId, { date: toISOFromLocal(local) });
+                        const tz = timezone || undefined;
+                        updatePost(droppedId, { date: toISOFromLocal(local, tz) });
                         setResched(true);
                         setTimeout(() => setResched(false), 1200);
                       }
@@ -168,7 +170,7 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
                   <ChannelBadge channel={p.channel} />
                   <div className="truncate text-sm text-zinc-900 dark:text-zinc-100">{p.title}</div>
                   <div className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
-                    {new Date(p.date).toTimeString().slice(0, 5)}
+                    {formatTimeHM(p.date, timezone || undefined)}
                   </div>
                 </div>
                 <div className="inline-flex items-center gap-2">

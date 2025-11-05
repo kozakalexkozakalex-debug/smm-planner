@@ -109,3 +109,16 @@ export function toLocalInputFromYMD(ymd: string, hour = 9, minute = 0): string {
   const min = String(dt.getMinutes()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
 }
+
+// Format HH:mm in an optional IANA time zone (default: local)
+export function formatTimeHM(iso: string, timeZone?: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const fmt = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    ...(timeZone ? { timeZone } : {}),
+  });
+  return fmt.format(d);
+}
