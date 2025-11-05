@@ -46,8 +46,8 @@ export default function PlannerDashboard() {
         open={!!dayYmd}
         ymd={dayYmd}
         onClose={() => setDayYmd(null)}
-        onNewForDay={(ymd) => {
-          setPrefillLocal(toLocalInputFromYMD(ymd, 9, 0));
+        onNewForDay={(ymd, hour, minute) => {
+          setPrefillLocal(toLocalInputFromYMD(ymd, hour ?? 9, minute ?? 0));
           setDayYmd(null);
           setEditing(null);
           setOpen(true);

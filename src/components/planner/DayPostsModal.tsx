@@ -11,7 +11,7 @@ type Props = {
   onClose: () => void;
   onEdit: (post: Post) => void;
   onDelete: (id: string) => void;
-  onNewForDay: (ymd: string) => void;
+  onNewForDay: (ymd: string, hour?: number, minute?: number) => void;
 };
 
 export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, onNewForDay }: Props) {
@@ -83,9 +83,35 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
       >
         <div className="mb-3 flex items-center justify-between">
           <h3 id="dayposts-title" className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{ymd}</h3>
-          <button type="button" onClick={() => onNewForDay(ymd)} ref={newBtnRef} className="btn-primary text-xs py-1.5 px-3">
-            New Post
-          </button>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => onNewForDay(ymd)} ref={newBtnRef} className="btn-primary text-xs py-1.5 px-3">
+              New Post
+            </button>
+            <div className="hidden sm:flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-400">
+              <span>Quick:</span>
+              <button
+                type="button"
+                onClick={() => onNewForDay(ymd, 9, 0)}
+                className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
+              >
+                09:00
+              </button>
+              <button
+                type="button"
+                onClick={() => onNewForDay(ymd, 13, 0)}
+                className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
+              >
+                13:00
+              </button>
+              <button
+                type="button"
+                onClick={() => onNewForDay(ymd, 18, 0)}
+                className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
+              >
+                18:00
+              </button>
+            </div>
+          </div>
         </div>
         <div className="space-y-2">
           {list.length === 0 ? (
