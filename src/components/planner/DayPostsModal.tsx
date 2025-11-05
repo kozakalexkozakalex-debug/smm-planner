@@ -5,6 +5,7 @@ import type { Post } from "@/lib/types";
 import { getPosts, subscribe, updatePost } from "@/lib/store";
 import { getSettings, subscribeSettings } from "@/lib/settings";
 import { toISOFromLocal } from "@/lib/dates";
+import Toast from "@/components/Toast";
 import StatusBadge from "@/components/StatusBadge";
 import ChannelBadge from "@/components/ChannelBadge";
 
@@ -24,6 +25,8 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
   const initialSettings = getSettings();
   const [quickTimes, setQuickTimes] = useState(() => initialSettings.quickTimes);
   const [timezone, setTimezone] = useState(() => initialSettings.timezone);
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  const [resched, setResched] = useState(false);
 
   useEffect(() => {
     return subscribe(() => setPosts(getPosts()));
@@ -116,16 +119,25 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
                     onClick={() => onNewForDay(ymd, qt.hour, qt.minute)}
                     onDragOver={(e) => {
                       e.preventDefault();
+                      setDragKey(label);
                     }}
+                    onDragLeave={() => setDragKey((k) => (k === label ? null : k))}
                     onDrop={(e) => {
                       e.preventDefault();
                       const droppedId = e.dataTransfer.getData("text/post-id");
                       if (droppedId) {
                         const local = `${ymd}T${label}`;
                         updatePost(droppedId, { date: toISOFromLocal(local) });
+                        setResched(true);
+                        setTimeout(() => setResched(false), 1200);
                       }
+                      setDragKey(null);
                     }}
-                    className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
+                    className={`rounded-md border px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 ${
+                      dragKey === label
+                        ? "border-amber-500 bg-amber-50 dark:bg-amber-500/10"
+                        : "border-zinc-300 bg-white"
+                    }`}
                   >
                     {label}
                   </button>
@@ -178,6 +190,7 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
           )}
         </div>
       </div>
+      <Toast show={resched} message="Rescheduled" />
     </div>
   );
 }
