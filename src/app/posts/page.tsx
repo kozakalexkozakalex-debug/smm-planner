@@ -7,7 +7,7 @@ import Filters from "@/components/posts/Filters";
 import Hotkeys from "@/components/Hotkeys";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
 import Pagination from "@/components/Pagination";
-import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost } from "@/lib/store";
+import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost } from "@/lib/posts";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
 import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
