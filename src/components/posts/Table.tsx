@@ -2,6 +2,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { Post } from "@/lib/types";
 import { formatDateYMD } from "@/lib/dates";
+import { getSettings } from "@/lib/settings";
 import StatusBadge from "@/components/StatusBadge";
 import ChannelBadge from "@/components/ChannelBadge";
 import { t } from "@/lib/i18n";
@@ -119,7 +120,7 @@ export default function PostsTable({
           ) : (
             posts.map((p) => (
               <tr key={p.id}>
-                <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">{formatDateYMD(p.date)}</td>
+                <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">{formatDateYMD(p.date, getSettings().timezone || undefined)}</td>
                 <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">
                   <ChannelBadge channel={p.channel} />
                 </td>

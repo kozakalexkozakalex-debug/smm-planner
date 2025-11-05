@@ -5,6 +5,7 @@ import type { Post } from "@/lib/types";
 import { STATUSES } from "@/lib/data";
 import { addPost, updatePost } from "@/lib/posts";
 import { toISOFromLocal } from "@/lib/dates";
+import { getSettings } from "@/lib/settings";
 import ChannelSelect from "@/components/ChannelSelect";
 import { t } from "@/lib/i18n";
 
@@ -92,7 +93,8 @@ export default function NewPostModal({
     if (!validate()) return;
 
     const local = dateTime || initialLocalDateTime || "";
-    const nextDate = toISOFromLocal(local);
+    const tz = getSettings().timezone || undefined;
+    const nextDate = toISOFromLocal(local, tz);
     const nextChannel = (channel || initialChannel) as Post["channel"];
     const nextTitle = title || (initialTitle ?? "");
 

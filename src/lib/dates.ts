@@ -1,17 +1,64 @@
-export function toISOFromLocal(local: string): string {
-  // Accepts input[type="datetime-local"] like "2025-11-05T09:00"
+// Convert a wall-clock time string (YYYY-MM-DDTHH:mm) in an optional IANA time zone
+// to a UTC ISO string. If no timezone is provided, uses the system local zone.
+export function toISOFromLocal(local: string, timeZone?: string): string {
   if (!local) return "";
-  const d = new Date(local);
-  return d.toISOString();
+  if (!timeZone) {
+    const d = new Date(local);
+    return d.toISOString();
+  }
+  // Parse components
+  const [datePart, timePart] = local.split("T");
+  const [y, m, d] = datePart.split("-").map((v) => parseInt(v, 10));
+  const [hh, mm] = (timePart || "00:00").split(":").map((v) => parseInt(v, 10));
+  if (!y || !m || !d) return "";
+  // Guess UTC epoch for this wall time
+  const utcGuess = Date.UTC(y, m - 1, d, hh || 0, mm || 0, 0, 0);
+  // Compute offset of the timeZone at this instant
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const parts = Object.fromEntries(
+    fmt.formatToParts(new Date(utcGuess)).map((p) => [p.type, p.value])
+  ) as Record<string, string>;
+  const tzWallMs = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour),
+    Number(parts.minute),
+    Number(parts.second)
+  );
+  // Offset between wall time observed and UTC guess
+  const offsetMs = tzWallMs - utcGuess;
+  const utcEpoch = Date.UTC(y, m - 1, d, hh || 0, mm || 0, 0, 0) - offsetMs;
+  return new Date(utcEpoch).toISOString();
 }
 
-export function formatDateYMD(iso: string): string {
+// Format an ISO timestamp into YYYY-MM-DD in an optional IANA time zone (or local).
+export function formatDateYMD(iso: string, timeZone?: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+  if (!timeZone) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  // en-CA yields YYYY-MM-DD
+  return fmt.format(d);
 }
 
 export function monthLabel(d: Date): string {

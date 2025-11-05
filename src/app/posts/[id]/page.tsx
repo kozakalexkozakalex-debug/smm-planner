@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import type { Post } from "@/lib/types";
 import { getPosts, updatePost, deletePost } from "@/lib/posts";
 import { formatDateYMD, toISOFromLocal } from "@/lib/dates";
+import { getSettings } from "@/lib/settings";
 import ChannelSelect from "@/components/ChannelSelect";
 import { STATUSES } from "@/lib/data";
 import Link from "next/link";
@@ -30,10 +31,11 @@ export default function PostDetailsPage() {
   function onSave() {
     if (!canSave) return;
     if (!post) return;
+    const tz = getSettings().timezone || undefined;
     updatePost(id, {
       title,
       channel: channel as Post["channel"],
-      date: toISOFromLocal(dateTime),
+      date: toISOFromLocal(dateTime, tz),
       status,
     });
     setSaved(true);
