@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Post } from "@/lib/types";
-import { getPosts, subscribe } from "@/lib/store";
+import { getPosts, subscribe, updatePost } from "@/lib/store";
 import { getSettings, subscribeSettings } from "@/lib/settings";
+import { toISOFromLocal } from "@/lib/dates";
 import StatusBadge from "@/components/StatusBadge";
 import ChannelBadge from "@/components/ChannelBadge";
 
@@ -113,6 +114,17 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
                     key={`${idx}-${label}`}
                     type="button"
                     onClick={() => onNewForDay(ymd, qt.hour, qt.minute)}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const droppedId = e.dataTransfer.getData("text/post-id");
+                      if (droppedId) {
+                        const local = `${ymd}T${label}`;
+                        updatePost(droppedId, { date: toISOFromLocal(local) });
+                      }
+                    }}
                     className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
                   >
                     {label}
@@ -123,15 +135,27 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
           </div>
         </div>
         <div className="space-y-2">
+          <div className="hidden sm:block text-[10px] text-zinc-500 dark:text-zinc-400">Tip: drag a post onto a time to reschedule.</div>
           {list.length === 0 ? (
             <div className="text-sm text-zinc-500 dark:text-zinc-400">No posts for this day.</div>
           ) : (
             list.map((p) => (
-              <div key={p.id} className="flex items-center justify-between rounded-md border border-zinc-200 p-2 dark:border-zinc-800">
+              <div
+                key={p.id}
+                className="flex items-center justify-between rounded-md border border-zinc-200 p-2 dark:border-zinc-800"
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData("text/post-id", p.id);
+                  e.dataTransfer.effectAllowed = "move";
+                }}
+              >
                 <div className="flex min-w-0 items-center gap-3">
                   <StatusBadge status={p.status} />
                   <ChannelBadge channel={p.channel} />
                   <div className="truncate text-sm text-zinc-900 dark:text-zinc-100">{p.title}</div>
+                  <div className="ml-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    {new Date(p.date).toTimeString().slice(0, 5)}
+                  </div>
                 </div>
                 <div className="inline-flex items-center gap-2">
                   <button
