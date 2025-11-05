@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 import type { Post } from "@/lib/types";
 import { formatDateYMD } from "@/lib/dates";
 import StatusBadge from "@/components/StatusBadge";
@@ -106,11 +107,7 @@ export default function PostsTable({
                         Clear filters
                       </button>
                     )}
-                    <button
-                      type="button"
-                      onClick={onCreate}
-                      className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-                    >
+                    <button type="button" onClick={onCreate} className="btn-primary">
                       {hasActiveFilters ? "New Post" : "Create a post"}
                     </button>
                   </div>
@@ -157,7 +154,9 @@ export default function PostsTable({
                       </button>
                     </div>
                   ) : (
-                    <span>{p.title}</span>
+                    <Link href={`/posts/${p.id}`} className="hover:underline">
+                      {p.title}
+                    </Link>
                   )}
                 </td>
                 <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">

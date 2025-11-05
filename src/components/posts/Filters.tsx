@@ -1,7 +1,9 @@
 "use client";
 
+import ChannelSelect from "@/components/ChannelSelect";
+
 type FiltersProps = {
-  channelOptions: Array<"Instagram" | "Facebook" | "TikTok" | "YouTube" | "X">;
+  channelOptions?: Array<"Instagram" | "Facebook" | "TikTok" | "YouTube" | "X">;
   statusOptions: Array<"Draft" | "Scheduled" | "Published">;
   selectedChannel: string;
   selectedStatus: string;
@@ -13,7 +15,6 @@ type FiltersProps = {
 };
 
 export default function Filters({
-  channelOptions,
   statusOptions,
   selectedChannel,
   selectedStatus,
@@ -29,18 +30,11 @@ export default function Filters({
         <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">
           Channel
         </label>
-        <select
-          value={selectedChannel}
-          onChange={(e) => onChannelChange(e.target.value)}
+        <ChannelSelect
+          value={(selectedChannel as unknown as import("@/lib/types").Post["channel"]) || ""}
+          onChange={(v) => onChannelChange(v)}
           className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
-        >
-          <option value="">All channels</option>
-          {channelOptions.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       <div className="flex flex-col">

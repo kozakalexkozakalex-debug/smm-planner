@@ -5,3 +5,8 @@ export type Post = {
   title: string;
   status: "Draft" | "Scheduled" | "Published";
 };
+
+export type Channel = {
+  id: string;
+  name: Post["channel"];
+};

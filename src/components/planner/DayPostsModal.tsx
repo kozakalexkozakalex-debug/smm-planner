@@ -83,12 +83,7 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
       >
         <div className="mb-3 flex items-center justify-between">
           <h3 id="dayposts-title" className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{ymd}</h3>
-          <button
-            type="button"
-            onClick={() => onNewForDay(ymd)}
-            ref={newBtnRef}
-            className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
+          <button type="button" onClick={() => onNewForDay(ymd)} ref={newBtnRef} className="btn-primary text-xs py-1.5 px-3">
             New Post
           </button>
         </div>

@@ -2,9 +2,10 @@
 
 import { useMemo, useRef, useState, useEffect } from "react";
 import type { Post } from "@/lib/types";
-import { CHANNELS, STATUSES } from "@/lib/data";
+import { STATUSES } from "@/lib/data";
 import { addPost, updatePost } from "@/lib/store";
 import { toISOFromLocal } from "@/lib/dates";
+import ChannelSelect from "@/components/ChannelSelect";
 
 type Props = {
   open: boolean;
@@ -189,18 +190,11 @@ export default function NewPostModal({
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="flex flex-col">
               <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Channel</label>
-              <select
+              <ChannelSelect
                 value={channel || initialChannel || ""}
-                onChange={(e) => setChannel(e.target.value as Post["channel"] | "")}
+                onChange={(v) => setChannel(v)}
                 className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
-              >
-                <option value="">Select…</option>
-                {CHANNELS.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              />
               {errors.channel && (
                 <span className="mt-1 text-xs text-red-600">{errors.channel}</span>
               )}
@@ -267,11 +261,7 @@ export default function NewPostModal({
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={!canSave}
-              className="inline-flex h-9 items-center rounded-md bg-zinc-900 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-            >
+            <button type="submit" disabled={!canSave} className="btn-primary disabled:cursor-not-allowed disabled:opacity-60">
               Save
             </button>
           </div>
