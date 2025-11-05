@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Post } from "@/lib/types";
 import { formatDateYMD } from "@/lib/dates";
 import StatusBadge from "@/components/StatusBadge";
+import ChannelBadge from "@/components/ChannelBadge";
 
 export type SortKey = "date" | "channel" | "title" | "status";
 export type SortDir = "asc" | "desc";
@@ -119,7 +120,7 @@ export default function PostsTable({
               <tr key={p.id}>
                 <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">{formatDateYMD(p.date)}</td>
                 <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">
-                  {p.channel}
+                  <ChannelBadge channel={p.channel} />
                 </td>
                 <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">
                   {editingId === p.id ? (

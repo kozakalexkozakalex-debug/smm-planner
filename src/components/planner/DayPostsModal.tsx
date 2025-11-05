@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Post } from "@/lib/types";
 import { getPosts, subscribe } from "@/lib/store";
+import { getSettings, subscribeSettings } from "@/lib/settings";
 import StatusBadge from "@/components/StatusBadge";
+import ChannelBadge from "@/components/ChannelBadge";
 
 type Props = {
   open: boolean;
@@ -18,9 +20,20 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
   const [posts, setPosts] = useState<Post[]>(() => getPosts());
   const containerRef = useRef<HTMLDivElement | null>(null);
   const newBtnRef = useRef<HTMLButtonElement | null>(null);
+  const initialSettings = getSettings();
+  const [quickTimes, setQuickTimes] = useState(() => initialSettings.quickTimes);
+  const [timezone, setTimezone] = useState(() => initialSettings.timezone);
 
   useEffect(() => {
     return subscribe(() => setPosts(getPosts()));
+  }, []);
+
+  useEffect(() => {
+    return subscribeSettings(() => {
+      const s = getSettings();
+      setQuickTimes(s.quickTimes);
+      setTimezone(s.timezone);
+    });
   }, []);
 
   const list = useMemo(() => {
@@ -88,28 +101,24 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
               New Post
             </button>
             <div className="hidden sm:flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-400">
-              <span>Quick:</span>
-              <button
-                type="button"
-                onClick={() => onNewForDay(ymd, 9, 0)}
-                className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
-              >
-                09:00
-              </button>
-              <button
-                type="button"
-                onClick={() => onNewForDay(ymd, 13, 0)}
-                className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
-              >
-                13:00
-              </button>
-              <button
-                type="button"
-                onClick={() => onNewForDay(ymd, 18, 0)}
-                className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
-              >
-                18:00
-              </button>
+              <span>
+                Quick{timezone ? ` (TZ ${timezone})` : ":"}
+              </span>
+              {quickTimes.map((qt, idx) => {
+                const hh = String(qt.hour).padStart(2, "0");
+                const mm = String(qt.minute).padStart(2, "0");
+                const label = `${hh}:${mm}`;
+                return (
+                  <button
+                    key={`${idx}-${label}`}
+                    type="button"
+                    onClick={() => onNewForDay(ymd, qt.hour, qt.minute)}
+                    className="rounded-md border border-zinc-300 bg-white px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -121,6 +130,7 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
               <div key={p.id} className="flex items-center justify-between rounded-md border border-zinc-200 p-2 dark:border-zinc-800">
                 <div className="flex min-w-0 items-center gap-3">
                   <StatusBadge status={p.status} />
+                  <ChannelBadge channel={p.channel} />
                   <div className="truncate text-sm text-zinc-900 dark:text-zinc-100">{p.title}</div>
                 </div>
                 <div className="inline-flex items-center gap-2">
