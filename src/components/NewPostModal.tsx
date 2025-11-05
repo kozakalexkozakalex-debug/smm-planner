@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import type { Post } from "@/lib/types";
 import { STATUSES } from "@/lib/data";
-import { addPost, updatePost } from "@/lib/store";
+import { addPost, updatePost } from "@/lib/posts";
 import { toISOFromLocal } from "@/lib/dates";
 import ChannelSelect from "@/components/ChannelSelect";
 import { t } from "@/lib/i18n";

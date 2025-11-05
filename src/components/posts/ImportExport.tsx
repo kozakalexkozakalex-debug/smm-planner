@@ -1,6 +1,6 @@
 "use client";
 
-import { getPosts, parsePosts, setPosts } from "@/lib/store";
+import { getPosts, parsePosts, setPosts } from "@/lib/posts";
 import { t } from "@/lib/i18n";
 
 type Props = {

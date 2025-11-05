@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { Post } from "@/lib/types";
-import { getPosts, updatePost, deletePost } from "@/lib/store";
+import { getPosts, updatePost, deletePost } from "@/lib/posts";
 import { formatDateYMD, toISOFromLocal } from "@/lib/dates";
 import ChannelSelect from "@/components/ChannelSelect";
 import { STATUSES } from "@/lib/data";

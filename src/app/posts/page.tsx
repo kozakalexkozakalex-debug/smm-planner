@@ -7,7 +7,7 @@ import Filters from "@/components/posts/Filters";
 import Hotkeys from "@/components/Hotkeys";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
 import Pagination from "@/components/Pagination";
-import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost } from "@/lib/posts";
+import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost, refresh, isRemote } from "@/lib/posts";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
 import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
@@ -72,7 +72,13 @@ function PostsPageInner() {
   }, [dupToast]);
 
   useEffect(() => {
-    return subscribe(() => setPosts(getPosts()));
+    // Subscribe to local changes
+    const unsub = subscribe(() => setPosts(getPosts()));
+    // If remote is enabled, refresh from server once on mount
+    if (isRemote()) {
+      void refresh();
+    }
+    return unsub;
   }, []);
 
   // Debounce title search for smoother filtering
