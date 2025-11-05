@@ -1,0 +1,251 @@
+export type Locale = "en" | "uk";
+
+const MESSAGES: Record<Locale, Record<string, string>> = {
+  en: {
+    // Navbar
+    "navbar.planner": "Planner",
+    "navbar.posts": "Posts",
+    "navbar.channels": "Channels",
+    "navbar.calendar": "Calendar",
+
+    // Planner
+    "planner.subtitle": "Plan posts for your channels.",
+    "button.newPost": "New Post",
+
+    // Calendar
+    "calendar.title": "Calendar",
+    "calendar.subtitle": "Plan and reschedule posts by day.",
+
+    // Channels
+    "channels.title": "Channels",
+    "channels.subtitle": "Manage available posting channels.",
+    "channels.new": "New channel",
+    "channels.add": "Add",
+    "channels.name": "Name",
+    "channels.actions": "Actions",
+    "channels.edit": "Edit",
+    "channels.cancel": "Cancel",
+    "channels.delete": "Delete",
+    "channels.empty": "No channels yet.",
+
+    // Generic
+    "select.placeholder": "Select…",
+    "action.save": "Save",
+    "action.cancel": "Cancel",
+    "action.edit": "Edit",
+    "action.quickEdit": "Quick Edit",
+    "action.duplicate": "Duplicate",
+    "action.delete": "Delete",
+    "action.undo": "Undo",
+
+    // Posts
+    "posts.title": "Posts",
+    "posts.subtitle": "List of scheduled and published posts.",
+    "filters.channel": "Channel",
+    "filters.status": "Status",
+    "filters.allStatuses": "All statuses",
+    "filters.title": "Title",
+    "filters.searchPlaceholder": "Search title…",
+    "table.date": "Date",
+    "table.channel": "Channel",
+    "table.title": "Title",
+    "table.status": "Status",
+    "table.actions": "Actions",
+    "table.noPosts": "No posts yet.",
+    "table.noMatches": "No posts match your filters.",
+    "table.clearFilters": "Clear filters",
+    "table.createPost": "Create a post",
+    "table.newPost": "New Post",
+    "confirm.deletePost": "Delete this post?",
+    "toast.saved": "Saved",
+    "toast.deleted": "Deleted",
+
+    // Pagination
+    "pagination.prev": "Prev",
+    "pagination.next": "Next",
+
+    // Import/Export
+    "importExport.exportJson": "Export JSON",
+    "importExport.importJson": "Import JSON",
+    "importExport.invalidFile": "Invalid file format",
+    "importExport.readError": "Failed to read file",
+
+    // Channels confirm
+    "confirm.deleteChannel": "Delete this channel?",
+
+    // New Post Modal
+    "newPost.titleNew": "New Post",
+    "newPost.titleEdit": "Edit Post",
+    "newPost.subtitle": "Fill in the details below.",
+    "newPost.channel": "Channel",
+    "newPost.status": "Status",
+    "newPost.datetime": "Date & Time",
+    "newPost.titleLabel": "Title",
+    "newPost.titlePlaceholder": "Post title…",
+    "newPost.contentLabel": "Content",
+    "newPost.contentPlaceholder": "Optional content…",
+    "error.required": "Required",
+
+    // Day modal
+    "day.tip": "Tip: drag a post onto a time to reschedule.",
+    "day.noPosts": "No posts for this day.",
+    "day.quick": "Quick",
+    "day.tz": "TZ",
+    "day.rescheduled": "Rescheduled",
+
+    // Settings
+    "settings.title": "Settings",
+    "settings.back": "← Back",
+    "settings.timezone": "Timezone",
+    "settings.note": "Note: Currently this affects quick-time presets only; full timezone handling coming next.",
+    "settings.quickTimes": "Quick times",
+    "settings.remove": "Remove",
+    "settings.addTime": "Add time",
+    "settings.save": "Save Settings",
+  },
+  uk: {
+    // Navbar
+    "navbar.planner": "Планер",
+    "navbar.posts": "Пости",
+    "navbar.channels": "Канали",
+    "navbar.calendar": "Календар",
+
+    // Planner
+    "planner.subtitle": "Плануй пости для своїх каналів.",
+    "button.newPost": "Новий пост",
+
+    // Calendar
+    "calendar.title": "Календар",
+    "calendar.subtitle": "Плануй та перенось пости по днях.",
+
+    // Channels
+    "channels.title": "Канали",
+    "channels.subtitle": "Керуйте доступними каналами для публікації.",
+    "channels.new": "Новий канал",
+    "channels.add": "Додати",
+    "channels.name": "Назва",
+    "channels.actions": "Дії",
+    "channels.edit": "Редагувати",
+    "channels.cancel": "Скасувати",
+    "channels.delete": "Видалити",
+    "channels.empty": "Ще немає каналів.",
+
+    // Generic
+    "select.placeholder": "Виберіть…",
+    "action.save": "Зберегти",
+    "action.cancel": "Скасувати",
+    "action.edit": "Редагувати",
+    "action.quickEdit": "Швидке редагування",
+    "action.duplicate": "Дублювати",
+    "action.delete": "Видалити",
+    "action.undo": "Повернути",
+
+    // Posts
+    "posts.title": "Пости",
+    "posts.subtitle": "Список запланованих і опублікованих постів.",
+    "filters.channel": "Канал",
+    "filters.status": "Статус",
+    "filters.allStatuses": "Усі статуси",
+    "filters.title": "Заголовок",
+    "filters.searchPlaceholder": "Пошук заголовку…",
+    "table.date": "Дата",
+    "table.channel": "Канал",
+    "table.title": "Заголовок",
+    "table.status": "Статус",
+    "table.actions": "Дії",
+    "table.noPosts": "Ще немає постів.",
+    "table.noMatches": "За фільтрами нічого не знайдено.",
+    "table.clearFilters": "Скинути фільтри",
+    "table.createPost": "Створити пост",
+    "table.newPost": "Новий пост",
+    "confirm.deletePost": "Видалити цей пост?",
+    "toast.saved": "Збережено",
+    "toast.deleted": "Видалено",
+
+    // Pagination
+    "pagination.prev": "Назад",
+    "pagination.next": "Далі",
+
+    // Import/Export
+    "importExport.exportJson": "Експорт JSON",
+    "importExport.importJson": "Імпорт JSON",
+    "importExport.invalidFile": "Некоректний формат файлу",
+    "importExport.readError": "Не вдалося прочитати файл",
+
+    // Channels confirm
+    "confirm.deleteChannel": "Видалити цей канал?",
+
+    // New Post Modal
+    "newPost.titleNew": "Новий пост",
+    "newPost.titleEdit": "Редагувати пост",
+    "newPost.subtitle": "Заповніть поля нижче.",
+    "newPost.channel": "Канал",
+    "newPost.status": "Статус",
+    "newPost.datetime": "Дата і час",
+    "newPost.titleLabel": "Заголовок",
+    "newPost.titlePlaceholder": "Заголовок посту…",
+    "newPost.contentLabel": "Контент",
+    "newPost.contentPlaceholder": "Необовʼязковий контент…",
+    "error.required": "Обовʼязково",
+
+    // Day modal
+    "day.tip": "Підказка: перетягніть пост на час, щоб перенести.",
+    "day.noPosts": "Немає постів на цей день.",
+    "day.quick": "Швидко",
+    "day.tz": "Часовий пояс",
+    "day.rescheduled": "Перенесено",
+
+    // Settings
+    "settings.title": "Налаштування",
+    "settings.back": "← Назад",
+    "settings.timezone": "Часовий пояс",
+    "settings.note": "Примітка: зараз це впливає лише на швидкі часи; повна підтримка таймзони буде пізніше.",
+    "settings.quickTimes": "Швидкі часи",
+    "settings.remove": "Видалити",
+    "settings.addTime": "Додати час",
+    "settings.save": "Зберегти налаштування",
+  },
+};
+
+let currentLocale: Locale = "en";
+let initialized = false;
+const listeners = new Set<() => void>();
+
+function ensureInit() {
+  if (initialized) return;
+  initialized = true;
+  if (typeof window !== "undefined") {
+    const saved = window.localStorage.getItem("locale") as Locale | null;
+    if (saved === "en" || saved === "uk") currentLocale = saved;
+  }
+}
+
+export function getLocale(): Locale {
+  ensureInit();
+  return currentLocale;
+}
+
+export function setLocale(next: Locale) {
+  ensureInit();
+  currentLocale = next;
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem("locale", next);
+    } catch {}
+  }
+  for (const fn of listeners) {
+    try {
+      fn();
+    } catch {}
+  }
+}
+
+export function subscribeLocale(fn: () => void): () => void {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+export function t(key: string): string {
+  const dict = MESSAGES[currentLocale] ?? MESSAGES.en;
+  return dict[key] ?? MESSAGES.en[key] ?? key;
+}

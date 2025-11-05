@@ -13,6 +13,7 @@ import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
 import Toast from "@/components/Toast";
 import ImportExport from "@/components/posts/ImportExport";
+import { t } from "@/lib/i18n";
 
 function PostsPageInner() {
   const router = useRouter();
@@ -171,7 +172,7 @@ function PostsPageInner() {
   }
 
   function handleDelete(id: string) {
-    if (!confirm("Delete this post?")) return;
+    if (!confirm(t("confirm.deletePost"))) return;
     const removed = deletePost(id);
     if (removed) {
       setUndo({ show: true, post: removed });
@@ -189,10 +190,8 @@ function PostsPageInner() {
     <section className="space-y-6">
       <header className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Posts</h1>
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-            Список запланованих і опублікованих постів.
-          </p>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">{t("posts.title")}</h1>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">{t("posts.subtitle")}</p>
         </div>
         <ImportExport
           onImported={(n) => setImportToast(`Imported ${n} posts`)}

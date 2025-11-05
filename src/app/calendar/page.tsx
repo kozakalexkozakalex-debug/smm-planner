@@ -1,21 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import MonthCalendar from "@/components/planner/MonthCalendar";
+import DayPostsModal from "@/components/planner/DayPostsModal";
 import NewPostModal from "@/components/NewPostModal";
 import Toast from "@/components/Toast";
-import MonthCalendar from "@/components/planner/MonthCalendar";
 import { toLocalInputFromYMD } from "@/lib/dates";
-import DayPostsModal from "@/components/planner/DayPostsModal";
 import type { Post } from "@/lib/types";
 import { addPost, deletePost } from "@/lib/store";
-import Hotkeys from "@/components/Hotkeys";
 import { t } from "@/lib/i18n";
 
-export default function PlannerDashboard() {
+export default function CalendarPage() {
   const [open, setOpen] = useState(false);
   const [prefillLocal, setPrefillLocal] = useState<string>("");
   const [dayYmd, setDayYmd] = useState<string | null>(null);
-  const [editing, setEditing] = useState<{ id: string; local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"] } | null>(null);
+  const [editing, setEditing] = useState<{
+    id: string;
+    local?: string;
+    channel?: Post["channel"];
+    title?: string;
+    status?: Post["status"];
+  } | null>(null);
   const [undo, setUndo] = useState<{ show: boolean; post?: Post }>({ show: false });
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [savedToast, setSavedToast] = useState(false);
@@ -28,16 +33,15 @@ export default function PlannerDashboard() {
 
   return (
     <section className="space-y-6">
-      <header>
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Planner Dashboard</h1>
-        <p className="mt-1 text-zinc-600 dark:text-zinc-400">{t("planner.subtitle")}</p>
-      </header>
-
-      <div className="flex flex-wrap items-center gap-3">
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">{t("calendar.title")}</h1>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">{t("calendar.subtitle")}</p>
+        </div>
         <button type="button" onClick={() => setOpen(true)} className="btn-primary">
           {t("button.newPost")}
         </button>
-      </div>
+      </header>
 
       <div className="rounded-lg border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
         <MonthCalendar onSelectDate={(ymd) => setDayYmd(ymd)} />
@@ -60,7 +64,7 @@ export default function PlannerDashboard() {
           setOpen(true);
         }}
         onDelete={(id) => {
-          if (!confirm(t("confirm.deletePost"))) return;
+          if (!confirm("Delete this post?")) return;
           const removed = deletePost(id);
           if (removed) {
             setUndo({ show: true, post: removed });
@@ -80,12 +84,12 @@ export default function PlannerDashboard() {
         initialTitle={editing?.title}
         initialStatus={editing?.status}
       />
-      <Hotkeys onNew={() => setOpen(true)} />
-      <Toast show={savedToast} message={t("toast.saved")} />
+
+      <Toast show={savedToast} message="Saved" />
       <Toast
         show={undo.show}
-        message={t("toast.deleted")}
-        actionLabel={t("action.undo")}
+        message="Deleted"
+        actionLabel="Undo"
         onAction={() => {
           if (undoTimer.current) {
             clearTimeout(undoTimer.current);

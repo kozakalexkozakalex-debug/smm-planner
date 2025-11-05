@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "@/lib/i18n";
 type Props = {
   page: number;
   totalPages: number;
@@ -16,7 +17,7 @@ export default function Pagination({ page, totalPages, onPageChange }: Props) {
         disabled={page <= 1}
         className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 disabled:opacity-50 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
-        Prev
+        {t("pagination.prev")}
       </button>
       <div className="text-zinc-600 dark:text-zinc-400">
         Page <span className="font-medium">{page}</span> of{" "}
@@ -28,9 +29,8 @@ export default function Pagination({ page, totalPages, onPageChange }: Props) {
         disabled={page >= totalPages}
         className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 disabled:opacity-50 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
-        Next
+        {t("pagination.next")}
       </button>
     </div>
   );
 }
-

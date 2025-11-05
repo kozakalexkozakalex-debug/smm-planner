@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Post } from "@/lib/types";
 import { getChannels, subscribeChannels } from "@/lib/channels";
+import { t } from "@/lib/i18n";
 
 type Props = {
   value: Post["channel"] | "";
@@ -19,7 +20,7 @@ export default function ChannelSelect({ value, onChange, className }: Props) {
       onChange={(e) => onChange(e.target.value as Post["channel"] | "")}
       className={className}
     >
-      <option value="">Select…</option>
+      <option value="">{t("select.placeholder")}</option>
       {options.map((c) => (
         <option key={c.id} value={c.name}>
           {c.name}
@@ -28,4 +29,3 @@ export default function ChannelSelect({ value, onChange, className }: Props) {
     </select>
   );
 }
-

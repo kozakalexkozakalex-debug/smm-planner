@@ -4,6 +4,7 @@ import type { Post } from "@/lib/types";
 import { formatDateYMD } from "@/lib/dates";
 import StatusBadge from "@/components/StatusBadge";
 import ChannelBadge from "@/components/ChannelBadge";
+import { t } from "@/lib/i18n";
 
 export type SortKey = "date" | "channel" | "title" | "status";
 export type SortDir = "asc" | "desc";
@@ -76,18 +77,18 @@ export default function PostsTable({
         <thead className="bg-zinc-50 dark:bg-zinc-900/50">
           <tr>
             <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-              {renderHeader("Date", "date")}
+              {renderHeader(t("table.date"), "date")}
             </th>
             <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-              {renderHeader("Channel", "channel")}
+              {renderHeader(t("table.channel"), "channel")}
             </th>
             <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-              {renderHeader("Title", "title")}
+              {renderHeader(t("table.title"), "title")}
             </th>
             <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
-              {renderHeader("Status", "status")}
+              {renderHeader(t("table.status"), "status")}
             </th>
-            <th className="px-4 py-3 text-right font-medium text-zinc-600 dark:text-zinc-400">Actions</th>
+            <th className="px-4 py-3 text-right font-medium text-zinc-600 dark:text-zinc-400">{t("table.actions")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -96,7 +97,7 @@ export default function PostsTable({
               <td className="px-4 py-10 text-center" colSpan={5}>
                 <div className="mx-auto max-w-md space-y-3">
                   <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                    {hasActiveFilters ? "No posts match your filters." : "No posts yet."}
+                    {hasActiveFilters ? t("table.noMatches") : t("table.noPosts")}
                   </div>
                   <div className="flex justify-center gap-2">
                     {hasActiveFilters && (
@@ -105,11 +106,11 @@ export default function PostsTable({
                         onClick={onClearFilters}
                         className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
                       >
-                        Clear filters
+                        {t("table.clearFilters")}
                       </button>
                     )}
                     <button type="button" onClick={onCreate} className="btn-primary">
-                      {hasActiveFilters ? "New Post" : "Create a post"}
+                      {hasActiveFilters ? t("table.newPost") : t("table.createPost")}
                     </button>
                   </div>
                 </div>
@@ -144,14 +145,14 @@ export default function PostsTable({
                         onClick={() => saveEdit(p)}
                         className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
                       >
-                        Save
+                        {t("action.save")}
                       </button>
                       <button
                         type="button"
                         onClick={cancelEdit}
                         className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                       >
-                        Cancel
+                        {t("action.cancel")}
                       </button>
                     </div>
                   ) : (
@@ -181,7 +182,7 @@ export default function PostsTable({
                       onClick={() => onEdit(p)}
                       className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                     >
-                      Edit
+                      {t("action.edit")}
                     </button>
                     {editingId !== p.id ? (
                       <button
@@ -189,7 +190,7 @@ export default function PostsTable({
                         onClick={() => startEdit(p)}
                         className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                       >
-                        Quick Edit
+                        {t("action.quickEdit")}
                       </button>
                     ) : null}
                     <button
@@ -197,14 +198,14 @@ export default function PostsTable({
                       onClick={() => onDuplicate(p.id)}
                       className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                     >
-                      Duplicate
+                      {t("action.duplicate")}
                     </button>
                     <button
                       type="button"
                       onClick={() => onDelete(p.id)}
                       className="rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
                     >
-                      Delete
+                      {t("action.delete")}
                     </button>
                   </div>
                 </td>

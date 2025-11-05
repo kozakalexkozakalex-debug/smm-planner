@@ -1,6 +1,7 @@
 "use client";
 
 import { getPosts, parsePosts, setPosts } from "@/lib/store";
+import { t } from "@/lib/i18n";
 
 type Props = {
   onImported?: (count: number) => void;
@@ -32,13 +33,13 @@ export default function ImportExport({ onImported, onError }: Props) {
         const text = await file.text();
         const parsed = parsePosts(text);
         if (!parsed) {
-          onError?.("Invalid file format");
+          onError?.(t("importExport.invalidFile"));
           return;
         }
         setPosts(parsed);
         onImported?.(parsed.length);
       } catch {
-        onError?.("Failed to read file");
+        onError?.(t("importExport.readError"));
       }
     };
     input.click();
@@ -51,16 +52,15 @@ export default function ImportExport({ onImported, onError }: Props) {
         onClick={handleExport}
         className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
-        Export JSON
+        {t("importExport.exportJson")}
       </button>
       <button
         type="button"
         onClick={handleImportClick}
         className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
-        Import JSON
+        {t("importExport.importJson")}
       </button>
     </div>
   );
 }
-

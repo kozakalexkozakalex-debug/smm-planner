@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Scheduler from "@/components/Scheduler";
+import SyncGate from "@/components/SyncGate";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +27,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <SyncGate />
         <Scheduler />
         <Navbar />
         <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getSettings, setSettings, subscribeSettings, type Settings } from "@/lib/settings";
 import Toast from "@/components/Toast";
 import Link from "next/link";
+import { t } from "@/lib/i18n";
 
 function timeToString(h: number, m: number) {
   const hh = String(h).padStart(2, "0");
@@ -50,28 +51,26 @@ export default function SettingsPage() {
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Settings</h1>
+        <h1 className="text-2xl font-semibold">{t("settings.title")}</h1>
         <Link href="/" className="link-nav">
-          ← Back
+          {t("settings.back")}
         </Link>
       </div>
 
       <div className="grid max-w-2xl gap-6">
         <div className="flex flex-col">
-          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Timezone</label>
+          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("settings.timezone")}</label>
           <input
             value={settings.timezone}
             onChange={(e) => onChangeTimezone(e.target.value)}
             placeholder="IANA timezone (e.g., Europe/Kyiv). Leave blank for local."
             className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
           />
-          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-            Note: Currently this affects quick-time presets only; full timezone handling coming next.
-          </p>
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{t("settings.note")}</p>
         </div>
 
         <div className="flex flex-col gap-3">
-          <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Quick times</div>
+          <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{t("settings.quickTimes")}</div>
           <div className="space-y-2">
             {settings.quickTimes.map((qt, i) => (
               <div key={i} className="flex items-center gap-2">
@@ -86,27 +85,26 @@ export default function SettingsPage() {
                   onClick={() => onRemoveQuick(i)}
                   className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
                 >
-                  Remove
+                  {t("settings.remove")}
                 </button>
               </div>
             ))}
           </div>
           <div>
             <button type="button" onClick={onAddQuick} className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800">
-              Add time
+              {t("settings.addTime")}
             </button>
           </div>
         </div>
 
         <div className="pt-2">
           <button type="button" onClick={onSave} className="btn-primary">
-            Save Settings
+            {t("settings.save")}
           </button>
         </div>
       </div>
 
-      <Toast show={saved} message="Saved" />
+      <Toast show={saved} message={t("action.save")} />
     </section>
   );
 }
-

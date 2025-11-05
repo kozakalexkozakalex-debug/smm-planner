@@ -8,6 +8,7 @@ import { toISOFromLocal } from "@/lib/dates";
 import Toast from "@/components/Toast";
 import StatusBadge from "@/components/StatusBadge";
 import ChannelBadge from "@/components/ChannelBadge";
+import { t } from "@/lib/i18n";
 
 type Props = {
   open: boolean;
@@ -102,11 +103,12 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
           <h3 id="dayposts-title" className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{ymd}</h3>
           <div className="flex items-center gap-2">
             <button type="button" onClick={() => onNewForDay(ymd)} ref={newBtnRef} className="btn-primary text-xs py-1.5 px-3">
-              New Post
+              {t("button.newPost")}
             </button>
             <div className="hidden sm:flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-400">
               <span>
-                Quick{timezone ? ` (TZ ${timezone})` : ":"}
+                {t("day.quick")}
+                {timezone ? ` (${t("day.tz")} ${timezone})` : ":"}
               </span>
               {quickTimes.map((qt, idx) => {
                 const hh = String(qt.hour).padStart(2, "0");
@@ -147,9 +149,9 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
           </div>
         </div>
         <div className="space-y-2">
-          <div className="hidden sm:block text-[10px] text-zinc-500 dark:text-zinc-400">Tip: drag a post onto a time to reschedule.</div>
+          <div className="hidden sm:block text-[10px] text-zinc-500 dark:text-zinc-400">{t("day.tip")}</div>
           {list.length === 0 ? (
-            <div className="text-sm text-zinc-500 dark:text-zinc-400">No posts for this day.</div>
+            <div className="text-sm text-zinc-500 dark:text-zinc-400">{t("day.noPosts")}</div>
           ) : (
             list.map((p) => (
               <div
@@ -175,14 +177,14 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
                     onClick={() => onEdit(p)}
                     className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                   >
-                    Edit
+                    {t("action.edit")}
                   </button>
                   <button
                     type="button"
                     onClick={() => onDelete(p.id)}
                     className="rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
                   >
-                    Delete
+                    {t("action.delete")}
                   </button>
                 </div>
               </div>
@@ -190,7 +192,7 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
           )}
         </div>
       </div>
-      <Toast show={resched} message="Rescheduled" />
+      <Toast show={resched} message={t("day.rescheduled")} />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { STATUSES } from "@/lib/data";
 import { addPost, updatePost } from "@/lib/store";
 import { toISOFromLocal } from "@/lib/dates";
 import ChannelSelect from "@/components/ChannelSelect";
+import { t } from "@/lib/i18n";
 
 type Props = {
   open: boolean;
@@ -67,9 +68,9 @@ export default function NewPostModal({
 
   function validate() {
     const next: typeof errors = {};
-    if (!(channel || initialChannel)) next.channel = "Required";
-    if (!(dateTime || initialLocalDateTime)) next.dateTime = "Required";
-    if (!(title || initialTitle)) next.title = "Required";
+    if (!(channel || initialChannel)) next.channel = t("error.required");
+    if (!(dateTime || initialLocalDateTime)) next.dateTime = t("error.required");
+    if (!(title || initialTitle)) next.title = t("error.required");
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -182,14 +183,14 @@ export default function NewPostModal({
         className="relative z-10 w-[92vw] max-w-lg rounded-lg border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:p-6"
       >
         <div className="mb-4">
-          <h2 id="newpost-title" className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{editingPostId ? "Edit Post" : "New Post"}</h2>
-          <p id="newpost-desc" className="text-sm text-zinc-600 dark:text-zinc-400">Fill in the details below.</p>
+          <h2 id="newpost-title" className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{editingPostId ? t("newPost.titleEdit") : t("newPost.titleNew")}</h2>
+          <p id="newpost-desc" className="text-sm text-zinc-600 dark:text-zinc-400">{t("newPost.subtitle")}</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="flex flex-col">
-              <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Channel</label>
+              <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("newPost.channel")}</label>
               <ChannelSelect
                 value={channel || initialChannel || ""}
                 onChange={(v) => setChannel(v)}
@@ -201,7 +202,7 @@ export default function NewPostModal({
             </div>
 
             <div className="flex flex-col">
-              <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Status</label>
+              <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("newPost.status")}</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as Post["status"])}
@@ -217,7 +218,7 @@ export default function NewPostModal({
           </div>
 
           <div className="flex flex-col">
-            <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Date & Time</label>
+            <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("newPost.datetime")}</label>
             <input
               type="datetime-local"
               value={dateTime || initialLocalDateTime || ""}
@@ -230,12 +231,12 @@ export default function NewPostModal({
           </div>
 
           <div className="flex flex-col">
-            <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Title</label>
+            <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("newPost.titleLabel")}</label>
             <input
               value={title || initialTitle || ""}
               onChange={(e) => setTitle(e.target.value)}
               className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
-              placeholder="Post title…"
+              placeholder={t("newPost.titlePlaceholder")}
             />
             {errors.title && (
               <span className="mt-1 text-xs text-red-600">{errors.title}</span>
@@ -243,13 +244,13 @@ export default function NewPostModal({
           </div>
 
           <div className="flex flex-col">
-            <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Content</label>
+            <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("newPost.contentLabel")}</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={4}
               className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
-              placeholder="Optional content…"
+              placeholder={t("newPost.contentPlaceholder")}
             />
           </div>
 
@@ -259,10 +260,10 @@ export default function NewPostModal({
               onClick={close}
               className="inline-flex h-9 items-center rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-900 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
             >
-              Cancel
+              {t("action.cancel")}
             </button>
             <button type="submit" disabled={!canSave} className="btn-primary disabled:cursor-not-allowed disabled:opacity-60">
-              Save
+              {t("action.save")}            
             </button>
           </div>
         </form>

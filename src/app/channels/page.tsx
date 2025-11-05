@@ -5,6 +5,7 @@ import Toast from "@/components/Toast";
 import ImportExportChannels from "@/components/channels/ImportExportChannels";
 import { addChannel, deleteChannel, getChannels, subscribeChannels, updateChannel } from "@/lib/channels";
 import type { Channel } from "@/lib/types";
+import { t } from "@/lib/i18n";
 
 export default function ChannelsPage() {
   const [channels, setChannelsState] = useState<Channel[]>(() => getChannels());
@@ -55,7 +56,7 @@ export default function ChannelsPage() {
     setDraftName("");
   }
   function handleDelete(id: string) {
-    if (!confirm("Delete this channel?")) return;
+    if (!confirm(t("confirm.deleteChannel"))) return;
     const removed = deleteChannel(id);
     if (removed) {
       setUndo({ show: true, channel: removed });
@@ -68,8 +69,8 @@ export default function ChannelsPage() {
     <section className="space-y-6">
       <header className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Channels</h1>
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">Manage available posting channels.</p>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">{t("channels.title")}</h1>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">{t("channels.subtitle")}</p>
         </div>
         <ImportExportChannels
           onImported={(n) => setImportToast(`Imported ${n} channels`)}
@@ -79,7 +80,7 @@ export default function ChannelsPage() {
 
       <div className="flex items-end gap-2">
         <div className="flex flex-col">
-          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">New channel</label>
+          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("channels.new")}</label>
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
@@ -92,7 +93,7 @@ export default function ChannelsPage() {
           onClick={handleAdd}
           className="h-9 rounded-md bg-zinc-900 px-4 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          Add
+          {t("channels.add")}
         </button>
       </div>
 
@@ -100,8 +101,8 @@ export default function ChannelsPage() {
         <table className="min-w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
           <thead className="bg-zinc-50 dark:bg-zinc-900/50">
             <tr>
-              <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">Name</th>
-              <th className="px-4 py-3 text-right font-medium text-zinc-600 dark:text-zinc-400">Actions</th>
+              <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">{t("channels.name")}</th>
+              <th className="px-4 py-3 text-right font-medium text-zinc-600 dark:text-zinc-400">{t("channels.actions")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -109,7 +110,7 @@ export default function ChannelsPage() {
               <tr>
                 <td className="px-4 py-10 text-center" colSpan={2}>
                   <div className="mx-auto max-w-md space-y-3">
-                    <div className="text-sm text-zinc-600 dark:text-zinc-400">No channels yet.</div>
+                    <div className="text-sm text-zinc-600 dark:text-zinc-400">{t("channels.empty")}</div>
                   </div>
                 </td>
               </tr>
@@ -138,14 +139,14 @@ export default function ChannelsPage() {
                           onClick={() => saveEdit(c)}
                           className="rounded-md bg-zinc-900 px-2 py-1 text-xs text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
                         >
-                          Save
+                          {t("channels.edit")}
                         </button>
                         <button
                           type="button"
                           onClick={cancelEdit}
                           className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                         >
-                          Cancel
+                          {t("channels.cancel")}
                         </button>
                       </div>
                     ) : (
@@ -160,7 +161,7 @@ export default function ChannelsPage() {
                           onClick={() => startEdit(c)}
                           className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                         >
-                          Edit
+                          {t("channels.edit")}
                         </button>
                       ) : null}
                       <button
@@ -168,7 +169,7 @@ export default function ChannelsPage() {
                         onClick={() => handleDelete(c.id)}
                         className="rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
                       >
-                        Delete
+                        {t("channels.delete")}
                       </button>
                     </div>
                   </td>
@@ -196,4 +197,3 @@ export default function ChannelsPage() {
     </section>
   );
 }
-
