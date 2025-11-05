@@ -111,16 +111,16 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "navbar.calendar": "Календар",
 
     // Planner
-    "planner.subtitle": "Плануй пости для своїх каналів.",
+    "planner.subtitle": "Плануйте публікації для своїх каналів.",
     "button.newPost": "Новий пост",
 
     // Calendar
     "calendar.title": "Календар",
-    "calendar.subtitle": "Плануй та перенось пости по днях.",
+    "calendar.subtitle": "Плануйте та переносіть пости по днях.",
 
     // Channels
     "channels.title": "Канали",
-    "channels.subtitle": "Керуйте доступними каналами для публікації.",
+    "channels.subtitle": "Керуйте доступними каналами публікації.",
     "channels.new": "Новий канал",
     "channels.add": "Додати",
     "channels.name": "Назва",
@@ -131,7 +131,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "channels.empty": "Ще немає каналів.",
 
     // Generic
-    "select.placeholder": "Виберіть…",
+    "select.placeholder": "Обрати…",
     "action.save": "Зберегти",
     "action.cancel": "Скасувати",
     "action.edit": "Редагувати",
@@ -147,14 +147,14 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "filters.status": "Статус",
     "filters.allStatuses": "Усі статуси",
     "filters.title": "Заголовок",
-    "filters.searchPlaceholder": "Пошук заголовку…",
+    "filters.searchPlaceholder": "Пошук за заголовком…",
     "table.date": "Дата",
     "table.channel": "Канал",
     "table.title": "Заголовок",
     "table.status": "Статус",
     "table.actions": "Дії",
-    "table.noPosts": "Ще немає постів.",
-    "table.noMatches": "За фільтрами нічого не знайдено.",
+    "table.noPosts": "Поки немає постів.",
+    "table.noMatches": "Нічого не знайдено за фільтрами.",
     "table.clearFilters": "Скинути фільтри",
     "table.createPost": "Створити пост",
     "table.newPost": "Новий пост",
@@ -169,7 +169,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     // Import/Export
     "importExport.exportJson": "Експорт JSON",
     "importExport.importJson": "Імпорт JSON",
-    "importExport.invalidFile": "Некоректний формат файлу",
+    "importExport.invalidFile": "Неправильний формат файлу",
     "importExport.readError": "Не вдалося прочитати файл",
 
     // Channels confirm
@@ -183,23 +183,23 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "newPost.status": "Статус",
     "newPost.datetime": "Дата і час",
     "newPost.titleLabel": "Заголовок",
-    "newPost.titlePlaceholder": "Заголовок посту…",
+    "newPost.titlePlaceholder": "Заголовок поста…",
     "newPost.contentLabel": "Контент",
-    "newPost.contentPlaceholder": "Необовʼязковий контент…",
-    "error.required": "Обовʼязково",
+    "newPost.contentPlaceholder": "Необов’язковий контент…",
+    "error.required": "Обов’язково",
 
     // Day modal
-    "day.tip": "Підказка: перетягніть пост на час, щоб перенести.",
-    "day.noPosts": "Немає постів на цей день.",
+    "day.tip": "Підказка: перетягніть пост на час, щоб змінити розклад.",
+    "day.noPosts": "На цей день постів немає.",
     "day.quick": "Швидко",
     "day.tz": "Часовий пояс",
-    "day.rescheduled": "Перенесено",
+    "day.rescheduled": "Переплановано",
 
     // Settings
     "settings.title": "Налаштування",
     "settings.back": "← Назад",
     "settings.timezone": "Часовий пояс",
-    "settings.note": "Примітка: зараз це впливає лише на швидкі часи; повна підтримка таймзони буде пізніше.",
+    "settings.note": "Примітка: наразі впливає лише на швидкі пресети; повна підтримка часового поясу — далі.",
     "settings.quickTimes": "Швидкі часи",
     "settings.remove": "Видалити",
     "settings.addTime": "Додати час",
@@ -249,3 +249,4 @@ export function t(key: string): string {
   const dict = MESSAGES[currentLocale] ?? MESSAGES.en;
   return dict[key] ?? MESSAGES.en[key] ?? key;
 }
+
