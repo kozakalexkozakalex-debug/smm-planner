@@ -5,9 +5,10 @@ import MonthCalendar from "@/components/planner/MonthCalendar";
 import DayPostsModal from "@/components/planner/DayPostsModal";
 import NewPostModal from "@/components/NewPostModal";
 import Toast from "@/components/Toast";
-import { toLocalInputFromYMD } from "@/lib/dates";
+import { toLocalInputFromYMD, formatDateYMD, formatTimeHM } from "@/lib/dates";
 import type { Post } from "@/lib/types";
-import { addPost, deletePost } from "@/lib/store";
+import { addPost, deletePost } from "@/lib/posts";
+import { getSettings } from "@/lib/settings";
 import { t } from "@/lib/i18n";
 
 export default function CalendarPage() {
@@ -52,13 +53,18 @@ export default function CalendarPage() {
         ymd={dayYmd}
         onClose={() => setDayYmd(null)}
         onNewForDay={(ymd, hour, minute) => {
-          setPrefillLocal(toLocalInputFromYMD(ymd, hour ?? 9, minute ?? 0));
+          const tz = getSettings().timezone || undefined;
+          setPrefillLocal(toLocalInputFromYMD(ymd, hour ?? 9, minute ?? 0, tz));
           setDayYmd(null);
           setEditing(null);
           setOpen(true);
         }}
         onEdit={(p) => {
-          const local = `${p.date.substring(0, 10)}T${new Date(p.date).toTimeString().slice(0, 5)}`;
+          const tz = getSettings().timezone || undefined;
+          const ymd = formatDateYMD(p.date, tz);
+          const hm = formatTimeHM(p.date, tz);
+          const [hh, mm] = hm.split(":").map((x) => parseInt(x, 10));
+          const local = toLocalInputFromYMD(ymd, hh || 0, mm || 0, tz);
           setEditing({ id: p.id, local, channel: p.channel, title: p.title, status: p.status });
           setDayYmd(null);
           setOpen(true);

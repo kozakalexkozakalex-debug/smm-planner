@@ -97,17 +97,30 @@ export function buildMonthGrid(anchor: Date, weekStart: 0 | 1 = 1): DayCell[] {
   return cells;
 }
 
-export function toLocalInputFromYMD(ymd: string, hour = 9, minute = 0): string {
+export function toLocalInputFromYMD(ymd: string, hour = 9, minute = 0, timeZone?: string): string {
   // Returns value for input[type="datetime-local"], e.g. 2025-11-05T09:00
   const [y, m, d] = ymd.split("-").map((v) => parseInt(v, 10));
   if (!y || !m || !d) return "";
-  const dt = new Date(y, m - 1, d, hour, minute, 0, 0);
-  const yyyy = dt.getFullYear();
-  const mm = String(dt.getMonth() + 1).padStart(2, "0");
-  const dd = String(dt.getDate()).padStart(2, "0");
-  const hh = String(dt.getHours()).padStart(2, "0");
-  const min = String(dt.getMinutes()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+  if (!timeZone) {
+    const dt = new Date(y, m - 1, d, hour, minute, 0, 0);
+    const yyyy = dt.getFullYear();
+    const mm = String(dt.getMonth() + 1).padStart(2, "0");
+    const dd = String(dt.getDate()).padStart(2, "0");
+    const hh = String(dt.getHours()).padStart(2, "0");
+    const min = String(dt.getMinutes()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+  }
+  // Build an ISO instant for the provided TZ wall time, then render it in local for input
+  const hh = String(hour).padStart(2, "0");
+  const mm = String(minute).padStart(2, "0");
+  const iso = toISOFromLocal(`${ymd}T${hh}:${mm}`, timeZone);
+  const local = new Date(iso);
+  const yyyy = local.getFullYear();
+  const m2 = String(local.getMonth() + 1).padStart(2, "0");
+  const d2 = String(local.getDate()).padStart(2, "0");
+  const h2 = String(local.getHours()).padStart(2, "0");
+  const min2 = String(local.getMinutes()).padStart(2, "0");
+  return `${yyyy}-${m2}-${d2}T${h2}:${min2}`;
 }
 
 // Format HH:mm in an optional IANA time zone (default: local)
