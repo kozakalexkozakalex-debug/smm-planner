@@ -23,6 +23,7 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
   const [posts, setPosts] = useState<Post[]>(() => getPosts());
   const containerRef = useRef<HTMLDivElement | null>(null);
   const newBtnRef = useRef<HTMLButtonElement | null>(null);
+  const lastActiveRef = useRef<HTMLElement | null>(null);
   const initialSettings = getSettings();
   const [quickTimes, setQuickTimes] = useState(() => initialSettings.quickTimes);
   const [timezone, setTimezone] = useState(() => initialSettings.timezone);
@@ -49,9 +50,17 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
 
   useEffect(() => {
     if (open) {
+      // store last focused element and move focus inside modal
+      lastActiveRef.current = document.activeElement as HTMLElement | null;
       if (newBtnRef.current) newBtnRef.current.focus();
     }
   }, [open]);
+
+  function close() {
+    onClose();
+    const last = lastActiveRef.current;
+    if (last) queueMicrotask(() => last.focus());
+  }
 
   function getFocusable(): HTMLElement[] {
     const root = containerRef.current;
@@ -92,12 +101,13 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center" onKeyDown={handleKeyDown}>
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/40" onClick={close} aria-hidden="true" />
       <div
         ref={containerRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="dayposts-title"
+        aria-describedby="dayposts-desc"
         className="relative z-10 w-[92vw] max-w-xl rounded-lg border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:p-6"
       >
         <div className="mb-3 flex items-center justify-between">
@@ -151,7 +161,7 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
           </div>
         </div>
         <div className="space-y-2">
-          <div className="hidden sm:block text-[10px] text-zinc-500 dark:text-zinc-400">{t("day.tip")}</div>
+          <div id="dayposts-desc" className="hidden sm:block text-[10px] text-zinc-500 dark:text-zinc-400">{t("day.tip")}</div>
           {list.length === 0 ? (
             <div className="text-sm text-zinc-500 dark:text-zinc-400">{t("day.noPosts")}</div>
           ) : (
