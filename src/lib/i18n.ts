@@ -105,6 +105,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "settings.remove": "Remove",
     "settings.addTime": "Add time",
     "settings.save": "Save Settings",
+    "settings.useBrowserTz": "Use browser TZ",
   },
   uk: {
     // Navbar
@@ -210,6 +211,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "settings.remove": "Видалити",
     "settings.addTime": "Додати час",
     "settings.save": "Зберегти налаштування",
+    "settings.useBrowserTz": "Використати часовий пояс браузера",
   },
 };
 

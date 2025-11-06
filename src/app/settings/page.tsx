@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getSettings, setSettings, subscribeSettings, type Settings } from "@/lib/settings";
 import Toast from "@/components/Toast";
 import Link from "next/link";
@@ -22,8 +22,16 @@ function stringToTime(v: string): { hour: number; minute: number } {
 export default function SettingsPage() {
   const [settings, setState] = useState<Settings>(() => getSettings());
   const [saved, setSaved] = useState(false);
+  const [tzList, setTzList] = useState<string[]>([]);
 
   useEffect(() => subscribeSettings(() => setState(getSettings())), []);
+  useEffect(() => {
+    try {
+      // @ts-ignore modern engines
+      const vals: string[] | undefined = (Intl as any).supportedValuesOf?.("timeZone");
+      if (Array.isArray(vals) && vals.length) setTzList(vals);
+    } catch {}
+  }, []);
 
   function onChangeTimezone(v: string) {
     setState((s) => ({ ...s, timezone: v }));
@@ -64,8 +72,30 @@ export default function SettingsPage() {
             value={settings.timezone}
             onChange={(e) => onChangeTimezone(e.target.value)}
             placeholder="IANA timezone (e.g., Europe/Kyiv). Leave blank for local."
+            list={tzList.length ? "tz-list" : undefined}
             className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
           />
+          {tzList.length ? (
+            <datalist id="tz-list">
+              {tzList.slice(0, 400).map((tz) => (
+                <option key={tz} value={tz} />
+              ))}
+            </datalist>
+          ) : null}
+          <div className="mt-2">
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                  if (tz) onChangeTimezone(tz);
+                } catch {}
+              }}
+              className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+            >
+              {t("settings.useBrowserTz")}
+            </button>
+          </div>
           <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{t("settings.note")}</p>
         </div>
 
