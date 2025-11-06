@@ -110,6 +110,15 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
         aria-describedby="dayposts-desc"
         className="relative z-10 w-[92vw] max-w-xl rounded-lg border border-zinc-200 bg-white p-4 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:p-6"
       >
+        <button
+          type="button"
+          onClick={close}
+          className="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          aria-label={t("action.close")}
+          title={t("action.close")}
+        >
+          ×
+        </button>
         <div className="mb-3 flex items-center justify-between">
           <h3 id="dayposts-title" className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{ymd}</h3>
           <div className="flex items-center gap-2">

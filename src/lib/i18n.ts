@@ -37,6 +37,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "action.duplicate": "Duplicate",
     "action.delete": "Delete",
     "action.undo": "Undo",
+    "action.close": "Close",
 
     // Posts
     "posts.title": "Posts",
@@ -143,6 +144,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "action.duplicate": "Дублювати",
     "action.delete": "Видалити",
     "action.undo": "Повернути",
+    "action.close": "Закрити",
 
     // Posts
     "posts.title": "Пости",
