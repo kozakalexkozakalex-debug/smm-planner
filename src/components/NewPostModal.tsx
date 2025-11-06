@@ -197,9 +197,11 @@ export default function NewPostModal({
                 value={channel || initialChannel || ""}
                 onChange={(v) => setChannel(v)}
                 className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+                aria-invalid={!!errors.channel}
+                aria-describedby={errors.channel ? "newpost-err-channel" : undefined}
               />
               {errors.channel && (
-                <span className="mt-1 text-xs text-red-600">{errors.channel}</span>
+                <span id="newpost-err-channel" className="mt-1 text-xs text-red-600">{errors.channel}</span>
               )}
             </div>
 
@@ -226,9 +228,11 @@ export default function NewPostModal({
               value={dateTime || initialLocalDateTime || ""}
               onChange={(e) => setDateTime(e.target.value)}
               className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+              aria-invalid={!!errors.dateTime}
+              aria-describedby={errors.dateTime ? "newpost-err-datetime" : undefined}
             />
             {errors.dateTime && (
-              <span className="mt-1 text-xs text-red-600">{errors.dateTime}</span>
+              <span id="newpost-err-datetime" className="mt-1 text-xs text-red-600">{errors.dateTime}</span>
             )}
           </div>
 
@@ -239,9 +243,11 @@ export default function NewPostModal({
               onChange={(e) => setTitle(e.target.value)}
               className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
               placeholder={t("newPost.titlePlaceholder")}
+              aria-invalid={!!errors.title}
+              aria-describedby={errors.title ? "newpost-err-title" : undefined}
             />
             {errors.title && (
-              <span className="mt-1 text-xs text-red-600">{errors.title}</span>
+              <span id="newpost-err-title" className="mt-1 text-xs text-red-600">{errors.title}</span>
             )}
           </div>
 

@@ -77,16 +77,16 @@ export default function PostsTable({
       <table className="min-w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
         <thead className="bg-zinc-50 dark:bg-zinc-900/50">
           <tr>
-            <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
+            <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400" aria-sort={sortKey === "date" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}>
               {renderHeader(t("table.date"), "date")}
             </th>
-            <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
+            <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400" aria-sort={sortKey === "channel" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}>
               {renderHeader(t("table.channel"), "channel")}
             </th>
-            <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
+            <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400" aria-sort={sortKey === "title" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}>
               {renderHeader(t("table.title"), "title")}
             </th>
-            <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400">
+            <th className="px-4 py-3 text-left font-medium text-zinc-600 dark:text-zinc-400" aria-sort={sortKey === "status" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}>
               {renderHeader(t("table.status"), "status")}
             </th>
             <th className="px-4 py-3 text-right font-medium text-zinc-600 dark:text-zinc-400">{t("table.actions")}</th>

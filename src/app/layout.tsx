@@ -31,10 +31,11 @@ export default function RootLayout({
         <meta charSet="utf-8" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <a href="#main" className="skip-link">Skip to content</a>
         <SyncGate />
         <Scheduler />
         <Navbar />
-        <main className="mx-auto max-w-6xl px-6 py-8">{children}</main>
+        <main id="main" className="mx-auto max-w-6xl px-6 py-8">{children}</main>
       </body>
     </html>
   );
