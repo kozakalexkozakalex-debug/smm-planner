@@ -5,11 +5,20 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { getLocale, setLocale, subscribeLocale, type Locale } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
+import { getWorkspaces, getCurrentWorkspace, setWorkspace, subscribeWorkspace } from "@/lib/workspace";
+import { refresh as refreshPosts } from "@/lib/posts";
+import { refresh as refreshChannels } from "@/lib/channelsBoundary";
 
 export default function Navbar() {
   const [locale, setLocaleState] = useState<Locale>(() => getLocale());
   useEffect(() => subscribeLocale(() => setLocaleState(getLocale())), []);
   const pathname = usePathname();
+  const [wsList, setWsList] = useState(() => getWorkspaces());
+  const [wsId, setWsId] = useState(() => getCurrentWorkspace()?.id || "");
+  useEffect(() => subscribeWorkspace(() => {
+    setWsList(getWorkspaces());
+    setWsId(getCurrentWorkspace()?.id || "");
+  }), []);
 
   function switchLocale(next: Locale) {
     if (next === locale) return;
@@ -72,6 +81,25 @@ export default function Navbar() {
             >
               UK
             </button>
+          </div>
+          <div className="ml-4 inline-flex items-center gap-2">
+            <label htmlFor="ws" className="sr-only">Workspace</label>
+            <select
+              id="ws"
+              value={wsId}
+              onChange={(e) => {
+                setWorkspace(e.target.value);
+                // simplest: refresh data and keep current page
+                refreshPosts().catch(() => {});
+                refreshChannels().catch(() => {});
+              }}
+              className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              aria-label="Workspace"
+            >
+              {wsList.map((w) => (
+                <option key={w.id} value={w.id}>{w.name}</option>
+              ))}
+            </select>
           </div>
         </nav>
       </div>

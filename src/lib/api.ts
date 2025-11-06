@@ -1,4 +1,5 @@
 import type { Post, Channel } from "@/lib/types";
+import { getCurrentWorkspace } from "@/lib/workspace";
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
@@ -15,11 +16,13 @@ function buildUrl(path: string): string {
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const url = buildUrl(path);
+  const ws = getCurrentWorkspace();
   const res = await fetch(url, {
     ...init,
     headers: {
       "Content-Type": "application/json",
       ...(init?.headers ?? {}),
+      ...(ws ? { "X-Workspace-Id": ws.id } : {}),
     },
     cache: "no-store",
   });
