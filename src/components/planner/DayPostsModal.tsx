@@ -193,6 +193,37 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
                   </div>
                 </div>
                 <div className="inline-flex items-center gap-2">
+                  <label className="sr-only" htmlFor={`move-${p.id}`}>
+                    Move post to time
+                  </label>
+                  <select
+                    id={`move-${p.id}`}
+                    aria-label="Move post to quick time"
+                    defaultValue=""
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (!val) return;
+                      const tz = timezone || undefined;
+                      const local = `${ymd}T${val}`;
+                      updatePost(p.id, { date: toISOFromLocal(local, tz) });
+                      setResched(true);
+                      setTimeout(() => setResched(false), 1200);
+                      e.currentTarget.value = "";
+                    }}
+                    className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                  >
+                    <option value="">Move to…</option>
+                    {quickTimes.map((qt, i) => {
+                      const hh = String(qt.hour).padStart(2, "0");
+                      const mm = String(qt.minute).padStart(2, "0");
+                      const label = `${hh}:${mm}`;
+                      return (
+                        <option key={`${p.id}-qt-${i}`} value={label}>
+                          {label}
+                        </option>
+                      );
+                    })}
+                  </select>
                   <button
                     type="button"
                     onClick={() => onEdit(p)}

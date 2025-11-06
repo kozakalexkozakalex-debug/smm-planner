@@ -91,6 +91,7 @@ export default function MonthCalendar({ onSelectDate }: Props) {
               type="button"
               key={`${c.ymd}-${idx}`}
               onClick={() => onSelectDate?.(c.ymd)}
+              aria-label={`${c.ymd} — ${total} posts`}
               className={`h-20 rounded-md border border-zinc-200 p-2 text-left hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/60 ${muted}`}
             >
               <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
@@ -126,4 +127,3 @@ export default function MonthCalendar({ onSelectDate }: Props) {
     </div>
   );
 }
-
