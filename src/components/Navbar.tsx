@@ -10,6 +10,7 @@ import { refresh as refreshPosts } from "@/lib/posts";
 import { refresh as refreshChannels } from "@/lib/channelsBoundary";
 import { getUser, subscribeUser, signInDemo, signOut } from "@/lib/auth";
 import SimpleModal from "@/components/SimpleModal";
+import { api } from "@/lib/api";
 
 export default function Navbar() {
   const [locale, setLocaleState] = useState<Locale>(() => getLocale());
@@ -20,6 +21,7 @@ export default function Navbar() {
   const [user, setUser] = useState(() => getUser());
   const [role, setRole] = useState<string>("OWNER");
   const [modal, setModal] = useState<{ open: boolean; kind: "new" | "rename" | "delete"; name?: string }>({ open: false, kind: "new" });
+  const [plan, setPlan] = useState<string>("");
   useEffect(() => subscribeUser(() => setUser(getUser())), []);
 
   useEffect(() => subscribeWorkspace(() => {
@@ -81,6 +83,14 @@ export default function Navbar() {
         const list = (await res.json()) as Array<{ id: string; role: string }>;
         const me = list.find((m) => m.id === user.id);
         if (me?.role) setRole(String(me.role));
+      } catch {}
+    })();
+  }, [wsId, user?.id]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const sub = await api.getSubscription();
+        if (sub?.plan) setPlan(String(sub.plan));
       } catch {}
     })();
   }, [wsId, user?.id]);
@@ -179,6 +189,15 @@ export default function Navbar() {
                 <option key={w.id} value={w.id}>{w.name}</option>
               ))}
             </select>
+            {plan ? (
+              <span
+                className="rounded border border-zinc-300 px-2 py-0.5 text-[10px] text-zinc-600 dark:border-zinc-700 dark:text-zinc-300"
+                title={`Plan: ${plan}`}
+                aria-label={`Plan ${plan}`}
+              >
+                {plan}
+              </span>
+            ) : null}
             <button
               type="button"
               onClick={() => setModal({ open: true, kind: "new", name: "" })}

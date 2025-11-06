@@ -64,8 +64,24 @@ export default function MembersPage() {
   }
 
   async function onChangeRole(memberId: string, nextRole: string) {
-    // Stub: server endpoint not implemented; show feedback only
-    showToast("Role change not implemented");
+    const ws = getCurrentWorkspace();
+    const user = getUser();
+    if (!ws || !user?.id) return;
+    try {
+      const res = await fetch(`/api/members/${memberId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "X-Workspace-Id": ws.id, "X-User-Id": user.id },
+        body: JSON.stringify({ role: nextRole }),
+      });
+      if (!res.ok) {
+        showToast("Failed to change role");
+        return;
+      }
+      await refreshMembers();
+      showToast("Role updated");
+    } catch {
+      showToast("Failed to change role");
+    }
   }
 
   const sorted = useMemo(() => {
@@ -191,4 +207,3 @@ export default function MembersPage() {
     </section>
   );
 }
-
