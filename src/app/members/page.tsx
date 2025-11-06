@@ -87,6 +87,7 @@ export default function MembersPage() {
   const sorted = useMemo(() => {
     return [...members].sort((a, b) => (a.email || a.id).localeCompare(b.email || b.id));
   }, [members]);
+  const ownersCount = useMemo(() => members.filter((m) => m.role === "OWNER").length, [members]);
 
   return (
     <section className="space-y-6">
@@ -147,10 +148,34 @@ export default function MembersPage() {
                     <div className="inline-flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => showToast("Not implemented")}
+                        onClick={async () => {
+                          if (!confirm("Remove this member?")) return;
+                          const ws = getCurrentWorkspace();
+                          const user = getUser();
+                          if (!ws || !user?.id) return;
+                          try {
+                            const res = await fetch(`/api/members/${m.id}` , { method: "DELETE", headers: { "X-Workspace-Id": ws.id, "X-User-Id": user.id } });
+                            if (!res.ok) {
+                              const body = await res.json().catch(() => ({}));
+                              if (body?.error === "cannot_remove_last_owner") showToast("Cannot remove last owner");
+                              else showToast("Failed to remove");
+                              return;
+                            }
+                            await refreshMembers();
+                            showToast("Removed");
+                          } catch {
+                            showToast("Failed to remove");
+                          }
+                        }}
                         className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-                        disabled={!canManage}
-                        title={!canManage ? "Only admins or owners can manage members" : undefined}
+                        disabled={!canManage || (m.role === "OWNER" && ownersCount <= 1)}
+                        title={
+                          !canManage
+                            ? "Only admins or owners can manage members"
+                            : m.role === "OWNER" && ownersCount <= 1
+                            ? "Cannot remove the last owner"
+                            : undefined
+                        }
                       >
                         Remove
                       </button>
