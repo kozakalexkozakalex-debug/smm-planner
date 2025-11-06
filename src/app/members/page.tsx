@@ -5,6 +5,7 @@ import Toast from "@/components/Toast";
 import SimpleModal from "@/components/SimpleModal";
 import { getCurrentWorkspace, subscribeWorkspace } from "@/lib/workspace";
 import { getUser } from "@/lib/auth";
+import Pagination from "@/components/Pagination";
 
 type Member = { id: string; email?: string | null; role: string };
 
@@ -13,6 +14,9 @@ export default function MembersPage() {
   const [role, setRole] = useState<string>("OWNER");
   const [toast, setToast] = useState<string | null>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   function showToast(msg: string) {
     setToast(msg);
@@ -89,6 +93,22 @@ export default function MembersPage() {
   }, [members]);
   const ownersCount = useMemo(() => members.filter((m) => m.role === "OWNER").length, [members]);
 
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return sorted;
+    return sorted.filter((m) => (m.email || m.id).toLowerCase().includes(term));
+  }, [sorted, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const pageItems = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, members.length]);
+
   return (
     <section className="space-y-6">
       <header className="flex items-center justify-between">
@@ -107,6 +127,21 @@ export default function MembersPage() {
         </button>
       </header>
 
+      <div className="flex items-end justify-between gap-3">
+        <div className="flex flex-col">
+          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Search</label>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by email"
+            className="h-9 w-72 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+          />
+        </div>
+        <div className="text-xs text-zinc-600 dark:text-zinc-400">{filtered.length} total</div>
+      </div>
+
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+
       <div className="overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
         <table className="min-w-full divide-y divide-zinc-200 text-sm dark:divide-zinc-800">
           <thead className="bg-zinc-50 dark:bg-zinc-900/50">
@@ -117,7 +152,7 @@ export default function MembersPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-            {sorted.length === 0 ? (
+            {filtered.length === 0 ? (
               <tr>
                 <td className="px-4 py-10 text-center" colSpan={3}>
                   <div className="mx-auto max-w-md space-y-3">
@@ -126,7 +161,7 @@ export default function MembersPage() {
                 </td>
               </tr>
             ) : (
-              sorted.map((m) => (
+              pageItems.map((m) => (
                 <tr key={m.id}>
                   <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">{m.email || m.id}</td>
                   <td className="px-4 py-3 text-zinc-800 dark:text-zinc-200">
@@ -187,6 +222,8 @@ export default function MembersPage() {
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
 
       <SimpleModal
         open={inviteOpen}
