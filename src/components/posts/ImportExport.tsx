@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { getPosts, parsePosts, setPosts } from "@/lib/posts";
 import { t } from "@/lib/i18n";
 import type { Post } from "@/lib/types";
@@ -41,9 +42,12 @@ function generateId(): string {
 }
 
 export default function ImportExport({ onImported, onError }: Props) {
+  const [live, setLive] = useState("");
   function handleExportJSON() {
     const data = JSON.stringify(getPosts(), null, 2);
     downloadBlob(data, "posts-export.json", "application/json");
+    const n = getPosts().length;
+    setLive(`Exported ${n} posts`);
   }
 
   function handleExportCSV() {
@@ -53,6 +57,8 @@ export default function ImportExport({ onImported, onError }: Props) {
     ];
     const csv = rows.map((r) => r.map((v) => escapeCsv(String(v))).join(",")).join("\n");
     downloadBlob(csv, "posts-export.csv", "text/csv;charset=utf-8");
+    const n = getPosts().length;
+    setLive(`Exported ${n} posts (CSV)`);
   }
 
   function handleImportJSON() {
@@ -66,13 +72,18 @@ export default function ImportExport({ onImported, onError }: Props) {
         const text = await file.text();
         const parsed = parsePosts(text);
         if (!parsed) {
-          onError?.(t("importExport.invalidFile"));
+          const msg = t("importExport.invalidFile");
+          onError?.(msg);
+          setLive(msg);
           return;
         }
         setPosts(parsed);
         onImported?.(parsed.length);
+        setLive(`Imported ${parsed.length} posts`);
       } catch {
-        onError?.(t("importExport.readError"));
+        const msg = t("importExport.readError");
+        onError?.(msg);
+        setLive(msg);
       }
     };
     input.click();
@@ -143,13 +154,18 @@ export default function ImportExport({ onImported, onError }: Props) {
         const text = await file.text();
         const parsed = parseCsv(text);
         if (!parsed) {
-          onError?.(t("importExport.invalidCsv"));
+          const msg = t("importExport.invalidCsv");
+          onError?.(msg);
+          setLive(msg);
           return;
         }
         setPosts(parsed);
         onImported?.(parsed.length);
+        setLive(`Imported ${parsed.length} posts (CSV)`);
       } catch {
-        onError?.(t("importExport.readError"));
+        const msg = t("importExport.readError");
+        onError?.(msg);
+        setLive(msg);
       }
     };
     input.click();
@@ -160,6 +176,7 @@ export default function ImportExport({ onImported, onError }: Props) {
       <button
         type="button"
         onClick={handleExportJSON}
+        aria-label={`${t("importExport.exportJson")} (${getPosts().length})`}
         className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
         {t("importExport.exportJson")}
@@ -167,6 +184,7 @@ export default function ImportExport({ onImported, onError }: Props) {
       <button
         type="button"
         onClick={handleImportJSON}
+        aria-label={t("importExport.importJson")}
         className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
         {t("importExport.importJson")}
@@ -175,6 +193,7 @@ export default function ImportExport({ onImported, onError }: Props) {
       <button
         type="button"
         onClick={handleExportCSV}
+        aria-label={`${t("importExport.exportCsv")} (${getPosts().length})`}
         className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
       >
         {t("importExport.exportCsv")}
@@ -182,10 +201,12 @@ export default function ImportExport({ onImported, onError }: Props) {
       <button
         type="button"
         onClick={handleImportCSV}
+        aria-label={t("importExport.importCsv")}
         className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
         {t("importExport.importCsv")}
       </button>
+      <div role="status" aria-live="polite" className="sr-only">{live}</div>
     </div>
   );
 }
