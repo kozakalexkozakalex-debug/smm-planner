@@ -92,3 +92,12 @@ export function parsePosts(raw: unknown): Post[] | null {
   return localParsePosts(raw);
 }
 
+export function publishPost(id: string): void {
+  localUpdatePost(id, { status: "Published" as Post["status"] });
+  if (remoteEnabled()) {
+    void api
+      .publishPost(id)
+      .then(() => refresh())
+      .catch(() => {});
+  }
+}

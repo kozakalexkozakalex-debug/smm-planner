@@ -20,6 +20,7 @@ type TableProps = {
   onUpdateStatus: (id: string, status: Post["status"]) => void;
   onUpdateTitle: (id: string, title: string) => void;
   onDuplicate: (id: string) => void;
+  onPublish: (id: string) => void;
   hasActiveFilters: boolean;
   onCreate: () => void;
   onClearFilters?: () => void;
@@ -35,6 +36,7 @@ export default function PostsTable({
   onUpdateStatus,
   onUpdateTitle,
   onDuplicate,
+  onPublish,
   hasActiveFilters,
   onCreate,
   onClearFilters,
@@ -179,6 +181,16 @@ export default function PostsTable({
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex items-center gap-2">
+                    {p.status !== "Published" && (
+                      <button
+                        type="button"
+                        onClick={() => onPublish(p.id)}
+                        className="rounded-md bg-emerald-600 px-2 py-1 text-xs text-white hover:bg-emerald-500"
+                        aria-label={`Publish post ${p.title}`}
+                      >
+                        {t("action.publish")}
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() => onEdit(p)}

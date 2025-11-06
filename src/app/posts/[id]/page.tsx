@@ -10,6 +10,7 @@ import ChannelSelect from "@/components/ChannelSelect";
 import { STATUSES } from "@/lib/data";
 import Link from "next/link";
 import Toast from "@/components/Toast";
+import { publishPost } from "@/lib/posts";
 import { t } from "@/lib/i18n";
 
 export default function PostDetailsPage() {
@@ -39,6 +40,13 @@ export default function PostDetailsPage() {
       date: toISOFromLocal(dateTime, tz),
       status,
     });
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
+  }
+
+  function onPublish() {
+    if (!post) return;
+    publishPost(id);
     setSaved(true);
     setTimeout(() => setSaved(false), 1500);
   }
@@ -110,6 +118,15 @@ export default function PostDetailsPage() {
           <button type="button" onClick={onSave} disabled={!canSave} className="btn-primary disabled:opacity-60">
             Save
           </button>
+          {post.status !== "Published" && (
+            <button
+              type="button"
+              onClick={onPublish}
+              className="inline-flex h-9 items-center rounded-md bg-emerald-600 px-3 text-sm font-medium text-white hover:bg-emerald-500"
+            >
+              Publish
+            </button>
+          )}
           <button
             type="button"
             onClick={onDelete}

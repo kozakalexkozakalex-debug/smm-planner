@@ -7,7 +7,7 @@ import Filters from "@/components/posts/Filters";
 import Hotkeys from "@/components/Hotkeys";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
 import Pagination from "@/components/Pagination";
-import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost, refresh, isRemote } from "@/lib/posts";
+import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost, refresh, isRemote, publishPost } from "@/lib/posts";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
 import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
@@ -238,6 +238,7 @@ function PostsPageInner() {
         onUpdateStatus={(id, status) => updatePost(id, { status })}
         onUpdateTitle={(id, title) => updatePost(id, { title })}
         onDuplicate={handleDuplicate}
+        onPublish={(id) => publishPost(id)}
         hasActiveFilters={hasActiveFilters}
         onCreate={() => setOpen(true)}
         onClearFilters={hasActiveFilters ? handleClearFilters : undefined}

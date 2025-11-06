@@ -7,6 +7,8 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "navbar.posts": "Posts",
     "navbar.channels": "Channels",
     "navbar.calendar": "Calendar",
+    "navbar.signIn": "Sign in",
+    "navbar.signOut": "Sign out",
 
     // Planner
     "planner.subtitle": "Plan posts for your channels.",
@@ -37,6 +39,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "action.duplicate": "Duplicate",
     "action.delete": "Delete",
     "action.undo": "Undo",
+    "action.publish": "Publish",
     "action.close": "Close",
 
     // Posts
@@ -61,6 +64,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "toast.saved": "Saved",
     "toast.deleted": "Deleted",
     "toast.duplicated": "Duplicated",
+    "toast.published": "Published",
 
     // Pagination
     "pagination.prev": "Prev",
@@ -115,6 +119,8 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "navbar.posts": "Пости",
     "navbar.channels": "Канали",
     "navbar.calendar": "Календар",
+    "navbar.signIn": "Увійти",
+    "navbar.signOut": "Вийти",
 
     // Planner
     "planner.subtitle": "Плануйте публікації для своїх каналів.",
@@ -145,6 +151,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "action.duplicate": "Дублювати",
     "action.delete": "Видалити",
     "action.undo": "Повернути",
+    "action.publish": "Опублікувати",
     "action.close": "Закрити",
 
     // Posts
@@ -169,6 +176,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "toast.saved": "Збережено",
     "toast.deleted": "Видалено",
     "toast.duplicated": "Дубльовано",
+    "toast.published": "Опубліковано",
 
     // Pagination
     "pagination.prev": "Назад",

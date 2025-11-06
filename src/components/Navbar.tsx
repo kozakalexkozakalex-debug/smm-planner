@@ -8,6 +8,7 @@ import { t } from "@/lib/i18n";
 import { getWorkspaces, getCurrentWorkspace, setWorkspace, subscribeWorkspace } from "@/lib/workspace";
 import { refresh as refreshPosts } from "@/lib/posts";
 import { refresh as refreshChannels } from "@/lib/channelsBoundary";
+import { getUser, subscribeUser, signInDemo, signOut } from "@/lib/auth";
 
 export default function Navbar() {
   const [locale, setLocaleState] = useState<Locale>(() => getLocale());
@@ -19,6 +20,8 @@ export default function Navbar() {
     setWsList(getWorkspaces());
     setWsId(getCurrentWorkspace()?.id || "");
   }), []);
+  const [user, setUser] = useState(() => getUser());
+  useEffect(() => subscribeUser(() => setUser(getUser())), []);
 
   function switchLocale(next: Locale) {
     if (next === locale) return;
@@ -100,6 +103,30 @@ export default function Navbar() {
                 <option key={w.id} value={w.id}>{w.name}</option>
               ))}
             </select>
+          </div>
+          <div className="ml-3 inline-flex items-center gap-2">
+            {user ? (
+              <>
+                <div className="hidden sm:block text-xs text-zinc-300 dark:text-zinc-400" aria-label={`Signed in as ${user.name}`}>
+                  {user.name}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="rounded border border-zinc-500/50 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800 dark:text-zinc-100"
+                >
+                  {t("navbar.signOut")}
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => signInDemo()}
+                className="rounded border border-zinc-500/50 px-2 py-1 text-xs text-zinc-200 hover:bg-zinc-800 dark:text-zinc-100"
+              >
+                {t("navbar.signIn")}
+              </button>
+            )}
           </div>
         </nav>
       </div>

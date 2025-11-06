@@ -47,6 +47,9 @@ export const api = {
   async deletePost(id: string): Promise<void> {
     await req<void>(`/posts/${id}`, { method: "DELETE" });
   },
+  async publishPost(id: string): Promise<Post> {
+    return req<Post>(`/posts/${id}/publish`, { method: "POST" });
+  },
   async getChannels(): Promise<Channel[]> {
     return req<Channel[]>("/channels");
   },
