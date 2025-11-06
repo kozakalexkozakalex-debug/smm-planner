@@ -8,6 +8,9 @@ import Hotkeys from "@/components/Hotkeys";
 import PostsTable, { type SortDir, type SortKey } from "@/components/posts/Table";
 import Pagination from "@/components/Pagination";
 import { addPost, deletePost, duplicatePost, getPosts, subscribe, updatePost, refresh, isRemote, publishPost } from "@/lib/posts";
+import { api } from "@/lib/api";
+import { entitlementsForPlan } from "@/lib/entitlements";
+import { getCurrentWorkspace } from "@/lib/workspace";
 import { CHANNELS as channelOptions, STATUSES as statusOptions } from "@/lib/data";
 import NewPostModal from "@/components/NewPostModal";
 import { formatDateYMD } from "@/lib/dates";
@@ -60,6 +63,8 @@ function PostsPageInner() {
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [importToast, setImportToast] = useState<string | null>(null);
   const [dupToast, setDupToast] = useState(false);
+  const [quotaToast, setQuotaToast] = useState(false);
+  const [createDisabled, setCreateDisabled] = useState(false);
   useEffect(() => {
     if (!importToast) return;
     const t = setTimeout(() => setImportToast(null), 2000);
@@ -80,6 +85,28 @@ function PostsPageInner() {
     }
     return unsub;
   }, []);
+
+  // Fetch plan/entitlements and determine over-quota create gating
+  useEffect(() => {
+    const ws = getCurrentWorkspace();
+    if (!ws) return;
+    (async () => {
+      try {
+        const sub = await api.getSubscription();
+        const ent = entitlementsForPlan(sub?.plan);
+        const limit = typeof ent.max_posts_per_month === "number" ? ent.max_posts_per_month : undefined;
+        if (!limit || limit <= 0) { setCreateDisabled(false); return; }
+        const now = new Date();
+        const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0));
+        const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1, 0, 0, 0));
+        const monthCount = getPosts().map(p => new Date(p.date)).filter(d => d >= start && d < end).length;
+        setCreateDisabled(monthCount >= limit);
+      } catch {
+        // on error, do not block creation
+        setCreateDisabled(false);
+      }
+    })();
+  }, [posts.length]);
 
   // Debounce title search for smoother filtering
   useEffect(() => {
@@ -188,7 +215,14 @@ function PostsPageInner() {
   }
 
   function handleDuplicate(id: string) {
-    const clone = duplicatePost(id);
+    const clone = duplicatePost(id, {
+      onError: (code) => {
+        if (code === "quota") {
+          setQuotaToast(true);
+          setTimeout(() => setQuotaToast(false), 2000);
+        }
+      },
+    });
     if (clone) setDupToast(true);
   }
 
@@ -240,8 +274,12 @@ function PostsPageInner() {
         onDuplicate={handleDuplicate}
         onPublish={(id) => publishPost(id)}
         hasActiveFilters={hasActiveFilters}
-        onCreate={() => setOpen(true)}
+        onCreate={() => {
+          if (createDisabled) { setQuotaToast(true); setTimeout(() => setQuotaToast(false), 2000); return; }
+          setOpen(true);
+        }}
         onClearFilters={hasActiveFilters ? handleClearFilters : undefined}
+        createDisabled={createDisabled}
       />
       <Pagination
         page={safePage}
@@ -266,6 +304,12 @@ function PostsPageInner() {
           setEditingId(null);
           setPrefill({});
         }}
+        onError={(code) => {
+          if (code === "quota") {
+            setQuotaToast(true);
+            setTimeout(() => setQuotaToast(false), 2000);
+          }
+        }}
         editingPostId={editingId ?? undefined}
         initialLocalDateTime={prefill.local}
         initialChannel={prefill.channel}
@@ -288,6 +332,7 @@ function PostsPageInner() {
       />
       <Toast show={!!importToast} message={importToast ?? ""} />
       <Toast show={dupToast} message={t("toast.duplicated")} />
+      <Toast show={quotaToast} message={t("error.quotaPostsExceeded")} />
     </section>
   );
 }

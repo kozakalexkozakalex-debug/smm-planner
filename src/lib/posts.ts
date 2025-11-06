@@ -46,13 +46,21 @@ export function subscribe(fn: () => void): () => void {
   return localSubscribe(fn);
 }
 
-export function addPost(p: Post): void {
+export function addPost(p: Post, opts?: { onError?: (code: string, err: unknown) => void }): void {
   localAddPost(p);
   if (remoteEnabled()) {
     void api
       .createPost(p)
       .then(() => refresh())
-      .catch(() => {});
+      .catch((err: any) => {
+        if (err?.status === 429) {
+          // revert optimistic add
+          localDeletePost(p.id);
+          opts?.onError?.("quota", err);
+          return;
+        }
+        opts?.onError?.("network", err);
+      });
   }
 }
 
@@ -77,13 +85,21 @@ export function deletePost(id: string): Post | null {
   return removed;
 }
 
-export function duplicatePost(id: string): Post | null {
+export function duplicatePost(id: string, opts?: { onError?: (code: string, err: unknown) => void }): Post | null {
   const clone = localDuplicatePost(id);
   if (clone && remoteEnabled()) {
     void api
       .createPost(clone)
       .then(() => refresh())
-      .catch(() => {});
+      .catch((err: any) => {
+        if (err?.status === 429) {
+          // revert optimistic duplicate
+          localDeletePost(clone.id);
+          opts?.onError?.("quota", err);
+          return;
+        }
+        opts?.onError?.("network", err);
+      });
   }
   return clone;
 }

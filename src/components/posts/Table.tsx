@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Post } from "@/lib/types";
 import { formatDateYMD } from "@/lib/dates";
@@ -6,6 +6,8 @@ import { getSettings } from "@/lib/settings";
 import StatusBadge from "@/components/StatusBadge";
 import ChannelBadge from "@/components/ChannelBadge";
 import { t } from "@/lib/i18n";
+import { getCurrentWorkspace } from "@/lib/workspace";
+import { getUser } from "@/lib/auth";
 
 export type SortKey = "date" | "channel" | "title" | "status";
 export type SortDir = "asc" | "desc";
@@ -24,6 +26,7 @@ type TableProps = {
   hasActiveFilters: boolean;
   onCreate: () => void;
   onClearFilters?: () => void;
+  createDisabled?: boolean;
 };
 
 export default function PostsTable({
@@ -40,9 +43,31 @@ export default function PostsTable({
   hasActiveFilters,
   onCreate,
   onClearFilters,
+  createDisabled,
 }: TableProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftTitle, setDraftTitle] = useState<string>("");
+  const [role, setRole] = useState<string>("OWNER");
+
+  useEffect(() => {
+    const curr = getCurrentWorkspace();
+    const user = getUser();
+    if (!curr || !user?.id) return;
+    (async () => {
+      try {
+        const res = await fetch("/api/members", { headers: { "X-Workspace-Id": curr.id, "X-User-Id": user.id } });
+        if (!res.ok) return;
+        const list = (await res.json()) as Array<{ id: string; role: string }>;
+        const me = list.find((m) => m.id === user.id);
+        if (me?.role) setRole(String(me.role));
+      } catch {}
+    })();
+  }, []);
+
+  const canUpdate = role === "OWNER" || role === "ADMIN" || role === "EDITOR";
+  const canDelete = role === "OWNER" || role === "ADMIN";
+  const canPublish = role !== "VIEWER";
+  const canCreate = role !== "VIEWER" && !Boolean(createDisabled);
 
   function startEdit(p: Post) {
     setEditingId(p.id);
@@ -113,7 +138,7 @@ export default function PostsTable({
                         {t("table.clearFilters")}
                       </button>
                     )}
-                    <button type="button" onClick={onCreate} className="btn-primary">
+                    <button type="button" onClick={onCreate} className="btn-primary disabled:opacity-50" disabled={!canCreate} title={!canCreate ? (createDisabled ? t("error.quotaPostsExceeded") : "Insufficient permissions") : undefined}>
                       {hasActiveFilters ? t("table.newPost") : t("table.createPost")}
                     </button>
                   </div>
@@ -171,7 +196,8 @@ export default function PostsTable({
                     <select
                       value={p.status}
                       onChange={(e) => onUpdateStatus(p.id, e.target.value as Post["status"])}
-                      className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                      className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs text-zinc-900 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                      disabled={!canUpdate}
                     >
                       <option value="Draft">Draft</option>
                       <option value="Scheduled">Scheduled</option>
@@ -185,8 +211,10 @@ export default function PostsTable({
                       <button
                         type="button"
                         onClick={() => onPublish(p.id)}
-                        className="rounded-md bg-emerald-600 px-2 py-1 text-xs text-white hover:bg-emerald-500"
+                        className="rounded-md bg-emerald-600 px-2 py-1 text-xs text-white hover:bg-emerald-500 disabled:opacity-50"
                         aria-label={`Publish post ${p.title}`}
+                        disabled={!canPublish}
+                        title={!canPublish ? "Insufficient permissions" : undefined}
                       >
                         {t("action.publish")}
                       </button>
@@ -194,8 +222,10 @@ export default function PostsTable({
                     <button
                       type="button"
                       onClick={() => onEdit(p)}
-                      className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                      className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                       aria-label={`Edit post ${p.title}`}
+                      disabled={!canUpdate}
+                      title={!canUpdate ? "Insufficient permissions" : undefined}
                     >
                       {t("action.edit")}
                     </button>
@@ -203,8 +233,10 @@ export default function PostsTable({
                       <button
                         type="button"
                         onClick={() => startEdit(p)}
-                        className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                        className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                         aria-label={`Quick edit post ${p.title}`}
+                        disabled={!canUpdate}
+                        title={!canUpdate ? "Insufficient permissions" : undefined}
                       >
                         {t("action.quickEdit")}
                       </button>
@@ -212,16 +244,19 @@ export default function PostsTable({
                     <button
                       type="button"
                       onClick={() => onDuplicate(p.id)}
-                      className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                      className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                       aria-label={`Duplicate post ${p.title}`}
+                      disabled={!canCreate}
+                      title={!canCreate ? (createDisabled ? t("error.quotaPostsExceeded") : "Insufficient permissions") : undefined}
                     >
                       {t("action.duplicate")}
                     </button>
                     <button
                       type="button"
                       onClick={() => onDelete(p.id)}
-                      className="rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
+                      className="rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500 disabled:opacity-50"
                       aria-label={`Delete post ${p.title}`}
+                      disabled={!canDelete}
                     >
                       {t("action.delete")}
                     </button>

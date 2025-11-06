@@ -40,13 +40,14 @@ model User {
   members   Member[]
   posts     Post[]    @relation("PostAuthor")
   audits    AuditLog[] @relation("AuditActor")
+  ownedWorkspaces Workspace[] @relation("UserOwnedWorkspaces")
 }
 
 model Workspace {
   id          String     @id @default(uuid())
   name        String
   ownerId     String
-  owner       User       @relation(fields: [ownerId], references: [id])
+  owner       User       @relation("UserOwnedWorkspaces", fields: [ownerId], references: [id])
   members     Member[]
   channels    Channel[]
   posts       Post[]
@@ -142,6 +143,7 @@ model Plan {
   priceCents Int
   period     String       // e.g., month, year
   entitlements Entitlement[]
+  subscriptions Subscription[]
 }
 
 model Entitlement {
@@ -187,4 +189,3 @@ model AuditLog {
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
   actor       User?     @relation("AuditActor", fields: [actorId], references: [id])
 }
-

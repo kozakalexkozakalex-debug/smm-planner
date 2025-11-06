@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import type { Post } from "@/lib/types";
 import { getPosts, updatePost, deletePost } from "@/lib/posts";
@@ -12,6 +12,8 @@ import Link from "next/link";
 import Toast from "@/components/Toast";
 import { publishPost } from "@/lib/posts";
 import { t } from "@/lib/i18n";
+import { getCurrentWorkspace } from "@/lib/workspace";
+import { getUser } from "@/lib/auth";
 
 export default function PostDetailsPage() {
   const params = useParams();
@@ -27,6 +29,26 @@ export default function PostDetailsPage() {
   const [dateTime, setDateTime] = useState<string>(localDefault);
   const [status, setStatus] = useState<Post["status"]>(post?.status ?? "Draft");
   const [saved, setSaved] = useState(false);
+  const [role, setRole] = useState<string>("OWNER");
+
+  useEffect(() => {
+    const curr = getCurrentWorkspace();
+    const user = getUser();
+    if (!curr || !user?.id) return;
+    (async () => {
+      try {
+        const res = await fetch("/api/members", { headers: { "X-Workspace-Id": curr.id, "X-User-Id": user.id } });
+        if (!res.ok) return;
+        const list = (await res.json()) as Array<{ id: string; role: string }>;
+        const me = list.find((m) => m.id === user.id);
+        if (me?.role) setRole(String(me.role));
+      } catch {}
+    })();
+  }, []);
+
+  const canUpdate = role === "OWNER" || role === "ADMIN" || role === "EDITOR";
+  const canDelete = role === "OWNER" || role === "ADMIN";
+  const canPublish = role !== "VIEWER";
 
   const canSave = Boolean(title && channel && dateTime);
 
@@ -75,7 +97,9 @@ export default function PostDetailsPage() {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+            disabled={!canUpdate}
+            title={!canUpdate ? "Insufficient permissions" : undefined}
           />
         </div>
 
@@ -85,7 +109,9 @@ export default function PostDetailsPage() {
             <ChannelSelect
               value={channel}
               onChange={(v) => setChannel(v)}
-              className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+              className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+              disabled={!canUpdate}
+              title={!canUpdate ? "Insufficient permissions" : undefined}
             />
           </div>
           <div className="flex flex-col">
@@ -93,7 +119,9 @@ export default function PostDetailsPage() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as Post["status"])}
-              className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+              className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+              disabled={!canUpdate}
+              title={!canUpdate ? "Insufficient permissions" : undefined}
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -110,15 +138,17 @@ export default function PostDetailsPage() {
             type="datetime-local"
             value={dateTime}
             onChange={(e) => setDateTime(e.target.value)}
-            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+            className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
+            disabled={!canUpdate}
+            title={!canUpdate ? "Insufficient permissions" : undefined}
           />
         </div>
 
         <div className="flex items-center gap-2 pt-2">
-          <button type="button" onClick={onSave} disabled={!canSave} className="btn-primary disabled:opacity-60">
+          <button type="button" onClick={onSave} disabled={!canSave || !canUpdate} className="btn-primary disabled:opacity-60" title={!canUpdate ? "Insufficient permissions" : undefined}>
             Save
           </button>
-          {post.status !== "Published" && (
+          {post.status !== "Published" && canPublish && (
             <button
               type="button"
               onClick={onPublish}
@@ -130,7 +160,9 @@ export default function PostDetailsPage() {
           <button
             type="button"
             onClick={onDelete}
-            className="inline-flex h-9 items-center rounded-md bg-red-600 px-3 text-sm font-medium text-white hover:bg-red-500"
+            className="inline-flex h-9 items-center rounded-md bg-red-600 px-3 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+            disabled={!canDelete}
+            title={!canDelete ? "Only admins or owners can delete" : undefined}
           >
             Delete
           </button>

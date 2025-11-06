@@ -17,9 +17,10 @@ type Props = {
   onEdit: (post: Post) => void;
   onDelete: (id: string) => void;
   onNewForDay: (ymd: string, hour?: number, minute?: number) => void;
+  createDisabled?: boolean;
 };
 
-export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, onNewForDay }: Props) {
+export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, onNewForDay, createDisabled }: Props) {
   const [posts, setPosts] = useState<Post[]>(() => getPosts());
   const containerRef = useRef<HTMLDivElement | null>(null);
   const newBtnRef = useRef<HTMLButtonElement | null>(null);
@@ -122,7 +123,7 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
         <div className="mb-3 flex items-center justify-between">
           <h3 id="dayposts-title" className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{ymd}</h3>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={() => onNewForDay(ymd)} ref={newBtnRef} className="btn-primary text-xs py-1.5 px-3">
+            <button type="button" onClick={() => onNewForDay(ymd)} ref={newBtnRef} className="btn-primary text-xs py-1.5 px-3 disabled:opacity-50" disabled={!!createDisabled} title={createDisabled ? t("error.quotaPostsExceeded") : undefined}>
               {t("button.newPost")}
             </button>
             <div className="hidden sm:flex items-center gap-1 text-[10px] text-zinc-500 dark:text-zinc-400">
@@ -156,11 +157,13 @@ export default function DayPostsModal({ open, ymd, onClose, onEdit, onDelete, on
                       }
                       setDragKey(null);
                     }}
-                    className={`rounded-md border px-2 py-0.5 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 ${
+                    className={`rounded-md border px-2 py-0.5 hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 ${
                       dragKey === label
                         ? "border-amber-500 bg-amber-50 dark:bg-amber-500/10"
                         : "border-zinc-300 bg-white"
                     }`}
+                    disabled={!!createDisabled}
+                    title={createDisabled ? t("error.quotaPostsExceeded") : undefined}
                   >
                     {label}
                   </button>

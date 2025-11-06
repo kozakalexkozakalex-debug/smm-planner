@@ -1,5 +1,6 @@
 import type { Post, Channel } from "@/lib/types";
 import { getCurrentWorkspace } from "@/lib/workspace";
+import { getUser } from "@/lib/auth";
 
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
@@ -17,18 +18,23 @@ function buildUrl(path: string): string {
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const url = buildUrl(path);
   const ws = getCurrentWorkspace();
+  const user = getUser();
   const res = await fetch(url, {
     ...init,
     headers: {
       "Content-Type": "application/json",
       ...(init?.headers ?? {}),
       ...(ws ? { "X-Workspace-Id": ws.id } : {}),
+      ...(user ? { "X-User-Id": user.id } : {}),
     },
     cache: "no-store",
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`API ${res.status}: ${text || res.statusText}`);
+    const err = new Error(`API ${res.status}: ${text || res.statusText}`) as Error & { status?: number; body?: unknown };
+    err.status = res.status;
+    try { err.body = text ? JSON.parse(text) : undefined; } catch { err.body = text; }
+    throw err;
   }
   return (await res.json()) as T;
 }
@@ -61,5 +67,9 @@ export const api = {
   },
   async deleteChannel(id: string): Promise<void> {
     await req<void>(`/channels/${id}`, { method: "DELETE" });
+  },
+  async getSubscription(): Promise<{ plan: string; status: string; currentPeriodEnd?: string }>
+  {
+    return req<{ plan: string; status: string; currentPeriodEnd?: string }>("/subscriptions");
   },
 };

@@ -13,6 +13,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onSaved?: () => void;
+  onError?: (code: "quota" | "network" | "forbidden" | "unknown") => void;
   initialLocalDateTime?: string;
   editingPostId?: string;
   initialChannel?: Post["channel"];
@@ -24,6 +25,7 @@ export default function NewPostModal({
   open,
   onClose,
   onSaved,
+  onError,
   initialLocalDateTime,
   editingPostId,
   initialChannel,
@@ -113,7 +115,11 @@ export default function NewPostModal({
         title: nextTitle,
         status,
       };
-      addPost(newPost);
+      addPost(newPost, {
+        onError: (code) => {
+          onError?.(code as any);
+        },
+      });
     }
     onSaved?.();
     resetForm();

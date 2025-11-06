@@ -66,6 +66,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "toast.deleted": "Deleted",
     "toast.duplicated": "Duplicated",
     "toast.published": "Published",
+    "error.quotaPostsExceeded": "Monthly post limit reached.",
 
     // Pagination
     "pagination.prev": "Prev",
