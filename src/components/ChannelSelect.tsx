@@ -5,13 +5,13 @@ import type { Post } from "@/lib/types";
 import { getChannels, subscribeChannels } from "@/lib/channels";
 import { t } from "@/lib/i18n";
 
-type Props = {
+type Props = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "onChange" | "value"> & {
   value: Post["channel"] | "";
   onChange: (next: Post["channel"] | "") => void;
   className?: string;
 };
 
-export default function ChannelSelect({ value, onChange, className }: Props) {
+export default function ChannelSelect({ value, onChange, className, ...rest }: Props) {
   const [options, setOptions] = useState(getChannels());
   useEffect(() => subscribeChannels(() => setOptions(getChannels())), []);
   return (
@@ -19,6 +19,7 @@ export default function ChannelSelect({ value, onChange, className }: Props) {
       value={value}
       onChange={(e) => onChange(e.target.value as Post["channel"] | "")}
       className={className}
+      {...rest}
     >
       <option value="">{t("select.placeholder")}</option>
       {options.map((c) => (

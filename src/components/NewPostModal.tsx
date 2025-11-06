@@ -208,6 +208,7 @@ export default function NewPostModal({
                 className="h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
                 aria-invalid={!!errors.channel}
                 aria-describedby={errors.channel ? "newpost-err-channel" : undefined}
+                required
               />
               {errors.channel && (
                 <span id="newpost-err-channel" className="mt-1 text-xs text-red-600">{errors.channel}</span>
@@ -239,6 +240,7 @@ export default function NewPostModal({
               className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
               aria-invalid={!!errors.dateTime}
               aria-describedby={errors.dateTime ? "newpost-err-datetime" : undefined}
+              required
             />
             {errors.dateTime && (
               <span id="newpost-err-datetime" className="mt-1 text-xs text-red-600">{errors.dateTime}</span>
@@ -254,6 +256,7 @@ export default function NewPostModal({
               placeholder={t("newPost.titlePlaceholder")}
               aria-invalid={!!errors.title}
               aria-describedby={errors.title ? "newpost-err-title" : undefined}
+              required
             />
             {errors.title && (
               <span id="newpost-err-title" className="mt-1 text-xs text-red-600">{errors.title}</span>
