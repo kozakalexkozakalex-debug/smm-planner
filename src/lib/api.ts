@@ -3,11 +3,18 @@ import type { Post, Channel } from "@/lib/types";
 const BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 function ok(): boolean {
-  return !!BASE && /^https?:\/\//.test(BASE);
+  // Treat relative API as enabled (use Next.js app routes)
+  return true;
+}
+
+function buildUrl(path: string): string {
+  if (BASE) return `${BASE}${path}`;
+  // Use relative Next.js routes under /api when no explicit BASE
+  return path.startsWith("/api") ? path : `/api${path}`;
 }
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = `${BASE}${path}`;
+  const url = buildUrl(path);
   const res = await fetch(url, {
     ...init,
     headers: {
@@ -50,4 +57,3 @@ export const api = {
     await req<void>(`/channels/${id}`, { method: "DELETE" });
   },
 };
-
