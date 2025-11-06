@@ -29,6 +29,7 @@ export function upsertPost(p: Partial<Post> & { id?: string }, workspaceId: stri
     date: p.date || new Date().toISOString(),
     channel: (p.channel as Post["channel"]) || "Instagram",
     title: p.title || "",
+    body: (p as any).body || "",
     status: (p.status as Post["status"]) || "Draft",
   };
   if (idx === -1) db.posts.unshift({ ...next, workspaceId });

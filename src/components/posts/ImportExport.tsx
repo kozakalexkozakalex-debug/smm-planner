@@ -52,8 +52,8 @@ export default function ImportExport({ onImported, onError }: Props) {
 
   function handleExportCSV() {
     const rows = [
-      ["id", "date", "channel", "title", "status"],
-      ...getPosts().map((p) => [p.id, p.date, p.channel, p.title, p.status]),
+      ["id", "date", "channel", "title", "body", "status"],
+      ...getPosts().map((p) => [p.id, p.date, p.channel, p.title, (p as any).body || "", p.status]),
     ];
     const csv = rows.map((r) => r.map((v) => escapeCsv(String(v))).join(",")).join("\n");
     downloadBlob(csv, "posts-export.csv", "text/csv;charset=utf-8");
@@ -122,6 +122,7 @@ export default function ImportExport({ onImported, onError }: Props) {
       date: header.indexOf("date"),
       channel: header.indexOf("channel"),
       title: header.indexOf("title"),
+      body: header.indexOf("body"),
       status: header.indexOf("status"),
     };
     if (idx.date === -1 || idx.channel === -1 || idx.title === -1 || idx.status === -1) return null;
@@ -135,10 +136,11 @@ export default function ImportExport({ onImported, onError }: Props) {
       const channel = cols[idx.channel] as Post["channel"];
       const title = cols[idx.title];
       const status = cols[idx.status] as Post["status"];
+      const body = idx.body !== -1 ? cols[idx.body] : "";
       if (!date || !title || !channels.has(channel) || !statuses.has(status)) continue;
       const d = new Date(date);
       if (Number.isNaN(d.getTime())) continue;
-      list.push({ id: id || generateId(), date: d.toISOString(), channel, title, status });
+      list.push({ id: id || generateId(), date: d.toISOString(), channel, title, body, status } as Post);
     }
     return list.length ? list : null;
   }

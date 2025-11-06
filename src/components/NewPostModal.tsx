@@ -19,6 +19,7 @@ type Props = {
   initialChannel?: Post["channel"];
   initialTitle?: string;
   initialStatus?: Post["status"];
+  initialContent?: string;
 };
 
 export default function NewPostModal({
@@ -31,6 +32,7 @@ export default function NewPostModal({
   initialChannel,
   initialTitle,
   initialStatus,
+  initialContent,
 }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const lastActiveRef = useRef<HTMLElement | null>(null);
@@ -105,6 +107,7 @@ export default function NewPostModal({
         date: nextDate,
         channel: nextChannel,
         title: nextTitle,
+        body: content || initialContent || "",
         status,
       });
     } else {
@@ -113,6 +116,7 @@ export default function NewPostModal({
         date: nextDate,
         channel: nextChannel,
         title: nextTitle,
+        body: content || "",
         status,
       };
       addPost(newPost, {

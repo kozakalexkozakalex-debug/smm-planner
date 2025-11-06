@@ -47,7 +47,7 @@ export function postToClient(p: any): ClientPost {
     date: (p.scheduledAt || p.publishedAt || p.createdAt || new Date()).toISOString(),
     channel: (p.channel?.name || "Instagram") as ClientPost["channel"],
     title: p.title || "",
+    body: p.body || "",
     status: toClientStatus(p.status),
   } as ClientPost;
 }
-

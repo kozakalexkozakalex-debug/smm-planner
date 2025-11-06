@@ -23,6 +23,7 @@ export default function PostDetailsPage() {
 
   const [title, setTitle] = useState<string>(post?.title ?? "");
   const [channel, setChannel] = useState<Post["channel"] | "">(post?.channel ?? "");
+  const [content, setContent] = useState<string>((post as any)?.body ?? "");
   const localDefault = post
     ? `${formatDateYMD(post.date)}T${new Date(post.date).toTimeString().slice(0, 5)}`
     : "";
@@ -60,6 +61,7 @@ export default function PostDetailsPage() {
       title,
       channel: channel as Post["channel"],
       date: toISOFromLocal(dateTime, tz),
+      body: content,
       status,
     });
     setSaved(true);
@@ -100,6 +102,18 @@ export default function PostDetailsPage() {
             className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:focus:border-zinc-600"
             disabled={!canUpdate}
             title={!canUpdate ? "Insufficient permissions" : undefined}
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("newPost.contentLabel")}</label>
+          <textarea
+            rows={6}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            placeholder={t("newPost.contentPlaceholder")}
+            disabled={!canUpdate}
           />
         </div>
 

@@ -3,6 +3,7 @@ export type Post = {
   date: string; // ISO date string
   channel: "Instagram" | "Facebook" | "TikTok" | "YouTube" | "X";
   title: string;
+  body?: string;
   status: "Draft" | "Scheduled" | "Published";
 };
 

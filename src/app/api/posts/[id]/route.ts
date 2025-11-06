@@ -39,6 +39,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
   }
   const data: any = {};
   if (body.title !== undefined) data.title = body.title;
+  if ((body as any).body !== undefined) data.body = (body as any).body || null;
   if (body.status !== undefined) data.status = toPrismaStatus(body.status);
   if (body.date) data.scheduledAt = new Date(body.date);
   if (body.channel) {

@@ -57,6 +57,6 @@ export async function POST(req: Request) {
   const dateIso = body.date ? new Date(body.date) : new Date();
   const chName = (body.channel as string) || "Instagram";
   const channel = await ensureChannel(ws, chName);
-  const created = await prisma.post.create({ data: { workspaceId: ws, channelId: channel.id, title: body.title || "", status: toPrismaStatus(body.status), scheduledAt: dateIso }, include: { channel: true } });
+  const created = await prisma.post.create({ data: { workspaceId: ws, channelId: channel.id, title: body.title || "", body: (body as any).body || null, status: toPrismaStatus(body.status), scheduledAt: dateIso }, include: { channel: true } });
   return NextResponse.json(postToClient(created), { status: 201 });
 }

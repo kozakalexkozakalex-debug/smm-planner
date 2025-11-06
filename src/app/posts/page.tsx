@@ -57,7 +57,7 @@ function PostsPageInner() {
   const [sortKey, setSortKey] = useState<SortKey>(validSort);
   const [sortDir, setSortDir] = useState<SortDir>(validDir);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [prefill, setPrefill] = useState<{ local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"] }>({});
+  const [prefill, setPrefill] = useState<{ local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"]; content?: string }>({});
   const [open, setOpen] = useState(false);
   const [undo, setUndo] = useState<{ show: boolean; post?: Post }>({ show: false });
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -199,6 +199,7 @@ function PostsPageInner() {
       local: `${formatDateYMD(p.date)}T${new Date(p.date).toTimeString().slice(0, 5)}`,
       channel: p.channel,
       title: p.title,
+      content: (p as any).body || "",
       status: p.status,
     });
     setOpen(true);
@@ -315,6 +316,7 @@ function PostsPageInner() {
         initialChannel={prefill.channel}
         initialTitle={prefill.title}
         initialStatus={prefill.status}
+        initialContent={prefill.content}
       />
 
       <Toast
