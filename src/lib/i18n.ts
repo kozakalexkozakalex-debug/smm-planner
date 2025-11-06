@@ -7,6 +7,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "navbar.posts": "Posts",
     "navbar.channels": "Channels",
     "navbar.calendar": "Calendar",
+    "navbar.integrations": "Integrations",
     "navbar.signIn": "Sign in",
     "navbar.signOut": "Sign out",
 
@@ -121,6 +122,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "navbar.calendar": "Календар",
     "navbar.signIn": "Увійти",
     "navbar.signOut": "Вийти",
+    "navbar.integrations": "Інтеграції",
 
     // Planner
     "planner.subtitle": "Плануйте публікації для своїх каналів.",

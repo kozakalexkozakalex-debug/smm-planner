@@ -54,6 +54,13 @@ export default function Navbar() {
             {t("navbar.calendar")}
           </Link>
           <Link
+            href="/integrations"
+            className={`link-nav ${pathname?.startsWith("/integrations") ? "font-semibold text-amber-400" : ""}`}
+            aria-current={pathname?.startsWith("/integrations") ? "page" : undefined}
+          >
+            {t("navbar.integrations")}
+          </Link>
+          <Link
             href="/posts"
             className={`link-nav ${pathname?.startsWith("/posts") ? "font-semibold text-amber-400" : ""}`}
             aria-current={pathname?.startsWith("/posts") ? "page" : undefined}
