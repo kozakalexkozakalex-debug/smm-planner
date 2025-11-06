@@ -8,6 +8,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "navbar.channels": "Channels",
     "navbar.calendar": "Calendar",
     "navbar.integrations": "Integrations",
+    "navbar.members": "Members",
     "navbar.signIn": "Sign in",
     "navbar.signOut": "Sign out",
 
@@ -117,6 +118,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
   },
   uk: {
     // Navbar
+    "navbar.members": "Members",
     "navbar.planner": "Планер",
     "navbar.posts": "Пости",
     "navbar.channels": "Канали",

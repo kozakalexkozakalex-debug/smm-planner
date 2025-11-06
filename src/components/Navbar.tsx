@@ -136,6 +136,13 @@ export default function Navbar() {
           >
             {t("navbar.channels")}
           </Link>
+          <Link
+            href="/members"
+            className={`link-nav ${pathname?.startsWith("/members") ? "font-semibold text-amber-400" : ""}`}
+            aria-current={pathname?.startsWith("/members") ? "page" : undefined}
+          >
+            {t("navbar.members")}
+          </Link>
           <div className="ml-2 inline-flex items-center gap-1 text-xs">
             <button
               type="button"
