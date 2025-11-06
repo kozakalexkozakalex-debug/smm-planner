@@ -65,6 +65,7 @@ export default function PostsTable({
         onClick={() => onSort(key)}
         className="inline-flex items-center gap-1 hover:underline"
         aria-label={`Sort by ${label}`}
+        aria-pressed={isActive}
       >
         <span>{label}</span>
         <span className="text-zinc-400">{arrow}</span>

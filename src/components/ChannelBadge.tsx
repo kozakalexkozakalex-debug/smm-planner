@@ -14,9 +14,12 @@ const styles: Record<Post["channel"], string> = {
 
 export default function ChannelBadge({ channel }: Props) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${styles[channel]}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${styles[channel]}`}
+      aria-label={`Channel: ${channel}`}
+      aria-roledescription="badge"
+    >
       {channel}
     </span>
   );
 }
-

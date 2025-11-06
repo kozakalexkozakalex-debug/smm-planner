@@ -15,7 +15,11 @@ const styles: Record<Post["status"], string> = {
 
 export default function StatusBadge({ status }: Props) {
   return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}>
+    <span
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}
+      aria-label={`Status: ${status}`}
+      aria-roledescription="badge"
+    >
       {status}
     </span>
   );

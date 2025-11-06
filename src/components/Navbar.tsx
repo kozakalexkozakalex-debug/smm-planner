@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { getLocale, setLocale, subscribeLocale, type Locale } from "@/lib/i18n";
 import { t } from "@/lib/i18n";
 
 export default function Navbar() {
   const [locale, setLocaleState] = useState<Locale>(() => getLocale());
   useEffect(() => subscribeLocale(() => setLocaleState(getLocale())), []);
+  const pathname = usePathname();
 
   function switchLocale(next: Locale) {
     if (next === locale) return;
@@ -25,10 +27,34 @@ export default function Navbar() {
           SMM Planner
         </Link>
         <nav className="flex items-center gap-6 text-sm">
-          <Link href="/" className="link-nav">{t("navbar.planner")}</Link>
-          <Link href="/calendar" className="link-nav">{t("navbar.calendar")}</Link>
-          <Link href="/posts" className="link-nav">{t("navbar.posts")}</Link>
-          <Link href="/channels" className="link-nav">{t("navbar.channels")}</Link>
+          <Link
+            href="/"
+            className={`link-nav ${pathname === "/" ? "font-semibold text-amber-400" : ""}`}
+            aria-current={pathname === "/" ? "page" : undefined}
+          >
+            {t("navbar.planner")}
+          </Link>
+          <Link
+            href="/calendar"
+            className={`link-nav ${pathname?.startsWith("/calendar") ? "font-semibold text-amber-400" : ""}`}
+            aria-current={pathname?.startsWith("/calendar") ? "page" : undefined}
+          >
+            {t("navbar.calendar")}
+          </Link>
+          <Link
+            href="/posts"
+            className={`link-nav ${pathname?.startsWith("/posts") ? "font-semibold text-amber-400" : ""}`}
+            aria-current={pathname?.startsWith("/posts") ? "page" : undefined}
+          >
+            {t("navbar.posts")}
+          </Link>
+          <Link
+            href="/channels"
+            className={`link-nav ${pathname?.startsWith("/channels") ? "font-semibold text-amber-400" : ""}`}
+            aria-current={pathname?.startsWith("/channels") ? "page" : undefined}
+          >
+            {t("navbar.channels")}
+          </Link>
           <div className="ml-2 inline-flex items-center gap-1 text-xs">
             <button
               type="button"
