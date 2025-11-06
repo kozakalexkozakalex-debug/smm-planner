@@ -43,9 +43,17 @@ const PLANS: Record<string, Entitlements> = {
   },
 };
 
-export async function getEntitlements(_workspaceId: string): Promise<Entitlements> {
-  // TODO: when Stripe is wired, resolve plan by subscription
-  return PLANS.Free;
+import { prisma } from "@/lib/db";
+
+export async function getEntitlements(workspaceId: string): Promise<Entitlements> {
+  try {
+    if (!prisma) return PLANS.Free;
+    const sub = await (prisma as any).subscription.findFirst({ where: { workspaceId } });
+    const plan = sub?.planCode as string | undefined;
+    return entitlementsForPlan(plan);
+  } catch {
+    return PLANS.Free;
+  }
 }
 
 export function entitlementsForPlan(plan: string | undefined | null): Entitlements {
