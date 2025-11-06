@@ -79,7 +79,7 @@ export default function SettingsPage() {
 
       <div className="grid max-w-2xl gap-6">
         <div className="flex flex-col">
-          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Plan</label>
+          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("settings.plan")}</label>
           <div className="flex items-center gap-2">
             <select
               value={plan}
@@ -88,9 +88,9 @@ export default function SettingsPage() {
                 setPlan(next);
                 try {
                   await fetch("/api/subscriptions", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: next }) });
-                  setPlanToast("Plan updated");
+                  setPlanToast(t("settings.planUpdated"));
                 } catch {
-                  setPlanToast("Failed to update plan");
+                  setPlanToast(t("settings.planUpdateFailed"));
                 }
                 setTimeout(() => setPlanToast(null), 1500);
               }}
@@ -102,7 +102,7 @@ export default function SettingsPage() {
                 </option>
               ))}
             </select>
-            <span className="text-xs text-zinc-500 dark:text-zinc-400">Affects quotas like posts/month.</span>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">{t("settings.planHelp")}</span>
           </div>
         </div>
         <div className="flex flex-col">

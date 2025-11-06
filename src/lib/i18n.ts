@@ -86,34 +86,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "confirm.deleteChannel": "Delete this channel?",
 
     // New Post Modal
-    
-    // Members
-    "members.title": "Members",
-    "members.subtitle": "Manage workspace members and roles.",
-    "members.invite": "Invite Member",
-    "members.inviteTitle": "Invite Member",
-    "members.inviteDesc": "Enter an email to invite to this workspace.",
-    "members.sendInvite": "Send Invite",
-    "members.inviteFailed": "Failed to invite",
-    "members.inviteSent": "Invite sent",
-    "members.search": "Search",
-    "members.searchPlaceholder": "Search by email",
-    "members.total": "total",
-    "members.email": "Email",
-    "members.role": "Role",
-    "members.actions": "Actions",
-    "members.remove": "Remove",
-    "members.confirmRemove": "Remove this member?",
-    "members.removeFailed": "Failed to remove",
-    "members.removed": "Removed",
-    "members.cannotRemoveLastOwner": "Cannot remove last owner",
-    "members.manageDisabled": "Only admins or owners can manage members",
-    "members.inviteDisabled": "Only admins or owners can invite",
-    "members.roleDisabled": "Only admins or owners can change roles",
-    "members.roleUpdated": "Role updated",
-    "members.roleFailed": "Failed to change role",
-    "members.empty": "No members found.",
-    "members.emailPlaceholder": "name@example.com","newPost.titleNew": "New Post",
+    "newPost.titleNew": "New Post",
     "newPost.titleEdit": "Edit Post",
     "newPost.subtitle": "Fill in the details below.",
     "newPost.channel": "Channel",
@@ -142,8 +115,12 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "settings.addTime": "Add time",
     "settings.save": "Save Settings",
     "settings.useBrowserTz": "Use browser TZ",
-  },
-  uk: {
+    "settings.plan": "Plan",
+    "settings.planHelp": "Affects quotas like posts/month.",
+    "settings.planUpdated": "Plan updated",
+    "settings.planUpdateFailed": "Failed to update plan",
+
+    // Members
     "members.title": "Members",
     "members.subtitle": "Manage workspace members and roles.",
     "members.invite": "Invite Member",
@@ -170,119 +147,8 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "members.roleFailed": "Failed to change role",
     "members.empty": "No members found.",
     "members.emailPlaceholder": "name@example.com",
-    // Navbar
-    "navbar.members": "Members",
-    "navbar.planner": "Планер",
-    "navbar.posts": "Пости",
-    "navbar.channels": "Канали",
-    "navbar.calendar": "Календар",
-    "navbar.signIn": "Увійти",
-    "navbar.signOut": "Вийти",
-    "navbar.integrations": "Інтеграції",
-
-    // Planner
-    "planner.subtitle": "Плануйте публікації для своїх каналів.",
-    "button.newPost": "Новий пост",
-
-    // Calendar
-    "calendar.title": "Календар",
-    "calendar.subtitle": "Плануйте та переносіть пости по днях.",
-
-    // Channels
-    "channels.title": "Канали",
-    "channels.subtitle": "Керуйте доступними каналами публікації.",
-    "channels.new": "Новий канал",
-    "channels.add": "Додати",
-    "channels.name": "Назва",
-    "channels.actions": "Дії",
-    "channels.edit": "Редагувати",
-    "channels.cancel": "Скасувати",
-    "channels.delete": "Видалити",
-    "channels.empty": "Ще немає каналів.",
-
-    // Generic
-    "select.placeholder": "Обрати…",
-    "action.save": "Зберегти",
-    "action.cancel": "Скасувати",
-    "action.edit": "Редагувати",
-    "action.quickEdit": "Швидке редагування",
-    "action.duplicate": "Дублювати",
-    "action.delete": "Видалити",
-    "action.undo": "Повернути",
-    "action.publish": "Опублікувати",
-    "action.close": "Закрити",
-
-    // Posts
-    "posts.title": "Пости",
-    "posts.subtitle": "Список запланованих і опублікованих постів.",
-    "filters.channel": "Канал",
-    "filters.status": "Статус",
-    "filters.allStatuses": "Усі статуси",
-    "filters.title": "Заголовок",
-    "filters.searchPlaceholder": "Пошук за заголовком…",
-    "table.date": "Дата",
-    "table.channel": "Канал",
-    "table.title": "Заголовок",
-    "table.status": "Статус",
-    "table.actions": "Дії",
-    "table.noPosts": "Поки немає постів.",
-    "table.noMatches": "Нічого не знайдено за фільтрами.",
-    "table.clearFilters": "Скинути фільтри",
-    "table.createPost": "Створити пост",
-    "table.newPost": "Новий пост",
-    "confirm.deletePost": "Видалити цей пост?",
-    "toast.saved": "Збережено",
-    "toast.deleted": "Видалено",
-    "toast.duplicated": "Дубльовано",
-    "toast.published": "Опубліковано",
-
-    // Pagination
-    "pagination.prev": "Назад",
-    "pagination.next": "Далі",
-
-    // Import/Export
-    "importExport.exportJson": "Експорт JSON",
-    "importExport.importJson": "Імпорт JSON",
-    "importExport.exportCsv": "Експорт CSV",
-    "importExport.importCsv": "Імпорт CSV",
-    "importExport.invalidFile": "Неправильний формат файлу",
-    "importExport.invalidCsv": "Неправильний CSV (перевірте заголовки та значення)",
-    "importExport.readError": "Не вдалося прочитати файл",
-
-    // Channels confirm
-    "confirm.deleteChannel": "Видалити цей канал?",
-
-    // New Post Modal
-    "newPost.titleNew": "Новий пост",
-    "newPost.titleEdit": "Редагувати пост",
-    "newPost.subtitle": "Заповніть поля нижче.",
-    "newPost.channel": "Канал",
-    "newPost.status": "Статус",
-    "newPost.datetime": "Дата і час",
-    "newPost.titleLabel": "Заголовок",
-    "newPost.titlePlaceholder": "Заголовок поста…",
-    "newPost.contentLabel": "Контент",
-    "newPost.contentPlaceholder": "Необов’язковий контент…",
-    "error.required": "Обов’язково",
-
-    // Day modal
-    "day.tip": "Підказка: перетягніть пост на час, щоб змінити розклад.",
-    "day.noPosts": "На цей день постів немає.",
-    "day.quick": "Швидко",
-    "day.tz": "Часовий пояс",
-    "day.rescheduled": "Переплановано",
-
-    // Settings
-    "settings.title": "Налаштування",
-    "settings.back": "← Назад",
-    "settings.timezone": "Часовий пояс",
-    "settings.note": "Примітка: наразі впливає лише на швидкі пресети; повна підтримка часового поясу — далі.",
-    "settings.quickTimes": "Швидкі часи",
-    "settings.remove": "Видалити",
-    "settings.addTime": "Додати час",
-    "settings.save": "Зберегти налаштування",
-    "settings.useBrowserTz": "Використати часовий пояс браузера",
   },
+  uk: {},
 };
 
 let currentLocale: Locale = "en";
@@ -327,3 +193,4 @@ export function t(key: string): string {
   const dict = MESSAGES[currentLocale] ?? MESSAGES.en;
   return dict[key] ?? MESSAGES.en[key] ?? key;
 }
+
