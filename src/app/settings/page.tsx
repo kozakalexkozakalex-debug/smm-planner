@@ -5,6 +5,8 @@ import { getSettings, setSettings, subscribeSettings, type Settings } from "@/li
 import Toast from "@/components/Toast";
 import Link from "next/link";
 import { t } from "@/lib/i18n";
+import { api } from "@/lib/api";
+import { getCurrentWorkspace } from "@/lib/workspace";
 
 function timeToString(h: number, m: number) {
   const hh = String(h).padStart(2, "0");
@@ -23,8 +25,18 @@ export default function SettingsPage() {
   const [settings, setState] = useState<Settings>(() => getSettings());
   const [saved, setSaved] = useState(false);
   const [tzList, setTzList] = useState<string[]>([]);
+  const [plan, setPlan] = useState<string>("Free");
+  const [planToast, setPlanToast] = useState<string | null>(null);
 
   useEffect(() => subscribeSettings(() => setState(getSettings())), []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const sub = await api.getSubscription();
+        if (sub?.plan) setPlan(sub.plan);
+      } catch {}
+    })();
+  }, [getCurrentWorkspace()?.id]);
   useEffect(() => {
     try {
       // @ts-ignore modern engines
@@ -66,6 +78,33 @@ export default function SettingsPage() {
       </div>
 
       <div className="grid max-w-2xl gap-6">
+        <div className="flex flex-col">
+          <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">Plan</label>
+          <div className="flex items-center gap-2">
+            <select
+              value={plan}
+              onChange={async (e) => {
+                const next = e.target.value;
+                setPlan(next);
+                try {
+                  await fetch("/api/subscriptions", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: next }) });
+                  setPlanToast("Plan updated");
+                } catch {
+                  setPlanToast("Failed to update plan");
+                }
+                setTimeout(() => setPlanToast(null), 1500);
+              }}
+              className="h-9 w-60 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            >
+              {(["Free", "Starter", "Pro", "Business"] as const).map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+            <span className="text-xs text-zinc-500 dark:text-zinc-400">Affects quotas like posts/month.</span>
+          </div>
+        </div>
         <div className="flex flex-col">
           <label className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-400">{t("settings.timezone")}</label>
           <input
@@ -135,6 +174,7 @@ export default function SettingsPage() {
       </div>
 
       <Toast show={saved} message={t("action.save")} />
+      <Toast show={!!planToast} message={planToast || ""} />
     </section>
   );
 }
