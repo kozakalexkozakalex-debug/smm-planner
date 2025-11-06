@@ -10,6 +10,7 @@ import ChannelSelect from "@/components/ChannelSelect";
 import { STATUSES } from "@/lib/data";
 import Link from "next/link";
 import Toast from "@/components/Toast";
+import { t } from "@/lib/i18n";
 
 export default function PostDetailsPage() {
   const params = useParams();
@@ -120,7 +121,7 @@ export default function PostDetailsPage() {
         </div>
       )}
 
-      <Toast show={saved} message="Saved" />
+      <Toast show={saved} message={t("toast.saved")} />
     </section>
   );
 }

@@ -183,6 +183,7 @@ export default function PostsTable({
                       type="button"
                       onClick={() => onEdit(p)}
                       className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                      aria-label={`Edit post ${p.title}`}
                     >
                       {t("action.edit")}
                     </button>
@@ -191,6 +192,7 @@ export default function PostsTable({
                         type="button"
                         onClick={() => startEdit(p)}
                         className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                        aria-label={`Quick edit post ${p.title}`}
                       >
                         {t("action.quickEdit")}
                       </button>
@@ -199,6 +201,7 @@ export default function PostsTable({
                       type="button"
                       onClick={() => onDuplicate(p.id)}
                       className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                      aria-label={`Duplicate post ${p.title}`}
                     >
                       {t("action.duplicate")}
                     </button>
@@ -206,6 +209,7 @@ export default function PostsTable({
                       type="button"
                       onClick={() => onDelete(p.id)}
                       className="rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
+                      aria-label={`Delete post ${p.title}`}
                     >
                       {t("action.delete")}
                     </button>

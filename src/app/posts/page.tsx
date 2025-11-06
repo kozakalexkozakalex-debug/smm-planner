@@ -274,8 +274,8 @@ function PostsPageInner() {
 
       <Toast
         show={undo.show}
-        message="Deleted"
-        actionLabel="Undo"
+        message={t("toast.deleted")}
+        actionLabel={t("action.undo")}
         onAction={() => {
           if (undoTimer.current) {
             clearTimeout(undoTimer.current);
@@ -286,7 +286,7 @@ function PostsPageInner() {
         }}
       />
       <Toast show={!!importToast} message={importToast ?? ""} />
-      <Toast show={dupToast} message="Duplicated" />
+      <Toast show={dupToast} message={t("toast.duplicated")} />
     </section>
   );
 }

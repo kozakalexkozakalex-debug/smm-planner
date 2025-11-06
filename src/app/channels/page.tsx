@@ -156,18 +156,20 @@ export default function ChannelsPage() {
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex items-center gap-2">
                       {editingId !== c.id ? (
-                        <button
-                          type="button"
-                          onClick={() => startEdit(c)}
-                          className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-                        >
-                          {t("channels.edit")}
-                        </button>
+                      <button
+                        type="button"
+                        onClick={() => startEdit(c)}
+                        className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                        aria-label={`Edit channel ${c.name}`}
+                      >
+                        {t("channels.edit")}
+                      </button>
                       ) : null}
                       <button
                         type="button"
                         onClick={() => handleDelete(c.id)}
                         className="rounded-md bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-500"
+                        aria-label={`Delete channel ${c.name}`}
                       >
                         {t("channels.delete")}
                       </button>
@@ -182,8 +184,8 @@ export default function ChannelsPage() {
 
       <Toast
         show={undo.show}
-        message="Deleted"
-        actionLabel="Undo"
+        message={t("toast.deleted")}
+        actionLabel={t("action.undo")}
         onAction={() => {
           if (undoTimer.current) {
             clearTimeout(undoTimer.current);

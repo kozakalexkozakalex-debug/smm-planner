@@ -60,6 +60,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "confirm.deletePost": "Delete this post?",
     "toast.saved": "Saved",
     "toast.deleted": "Deleted",
+    "toast.duplicated": "Duplicated",
 
     // Pagination
     "pagination.prev": "Prev",
@@ -167,6 +168,7 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "confirm.deletePost": "Видалити цей пост?",
     "toast.saved": "Збережено",
     "toast.deleted": "Видалено",
+    "toast.duplicated": "Дубльовано",
 
     // Pagination
     "pagination.prev": "Назад",

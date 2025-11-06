@@ -91,11 +91,11 @@ export default function CalendarPage() {
         initialStatus={editing?.status}
       />
 
-      <Toast show={savedToast} message="Saved" />
+      <Toast show={savedToast} message={t("toast.saved")} />
       <Toast
         show={undo.show}
-        message="Deleted"
-        actionLabel="Undo"
+        message={t("toast.deleted")}
+        actionLabel={t("action.undo")}
         onAction={() => {
           if (undoTimer.current) {
             clearTimeout(undoTimer.current);
