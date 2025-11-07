@@ -84,6 +84,19 @@ export default function PostDetailsPage() {
     }
   }
 
+  function formatPreview(dt: string | undefined | null): string {
+    const val = dt || "";
+    if (!val) return "—";
+    const d = new Date(val);
+    if (Number.isNaN(d.getTime())) return val;
+    try {
+      return d.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" } as any);
+    } catch {
+      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    }
+  }
+  const previewText = content.length > 280 ? `${content.slice(0, 277)}…` : content;
+
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
@@ -161,11 +174,11 @@ export default function PostDetailsPage() {
 
         <div className="flex flex-col gap-4">
           <div>
-            <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Preview</div>
+            <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{t("preview.title")}</div>
             <div className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
-              <div className="text-xs text-zinc-500 dark:text-zinc-400">{channel || "—"} • {dateTime || "—"}</div>
+              <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400"><ChannelBadge channel={(channel || "Instagram") as Post["channel"]} /><span>• {formatPreview(dateTime)}</span></div>
               <div className="mt-1 truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{title || "Untitled"}</div>
-              <div className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-200">{content || ""}</div>
+              <div className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-200">{previewText}</div>
             </div>
           </div>
           <div className="flex items-center gap-2 pt-2">

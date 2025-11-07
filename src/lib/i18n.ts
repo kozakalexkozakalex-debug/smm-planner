@@ -105,6 +105,9 @@ const MESSAGES: Record<Locale, Record<string, string>> = {
     "day.tz": "TZ",
     "day.rescheduled": "Rescheduled",
 
+    // Preview
+    "preview.title": "Preview",
+
     // Settings
     "settings.title": "Settings",
     "settings.back": "← Back",
