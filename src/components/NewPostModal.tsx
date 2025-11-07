@@ -8,6 +8,7 @@ import { toISOFromLocal } from "@/lib/dates";
 import { getSettings } from "@/lib/settings";
 import ChannelSelect from "@/components/ChannelSelect";
 import ChannelBadge from "@/components/ChannelBadge";
+import StatusBadge from "@/components/StatusBadge";
 import { t } from "@/lib/i18n";
 
 type Props = {
