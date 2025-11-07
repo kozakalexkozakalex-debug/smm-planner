@@ -43,6 +43,7 @@ export default function NewPostModal({
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<string>("");
   const [status, setStatus] = useState<Post["status"]>(initialStatus ?? "Draft");
+  const [copied, setCopied] = useState(false);
 
   const [errors, setErrors] = useState<{ channel?: string; dateTime?: string; title?: string }>({});
 
@@ -148,6 +149,15 @@ export default function NewPostModal({
     const txt = content || initialContent || "";
     return txt.length > 280 ? `${txt.slice(0, 277)}…` : txt;
   })();
+
+  async function copyPreview() {
+    try {
+      const txt = `${title || initialTitle || ""}\n${content || initialContent || ""}`.trim();
+      await navigator.clipboard.writeText(txt);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {}
+  }
 
   function getFocusable(): HTMLElement[] {
     const root = containerRef.current;
@@ -304,7 +314,17 @@ export default function NewPostModal({
           </div>
 
           <div className="mt-2">
-            <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{t("preview.title")}</div>
+            <div className="flex items-center justify-between text-sm font-medium text-zinc-700 dark:text-zinc-200">
+              <span>{t("preview.title")}</span>
+              <button
+                type="button"
+                onClick={copyPreview}
+                className="rounded-md border border-zinc-300 px-2 py-0.5 text-[10px] font-normal text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                aria-live="polite"
+              >
+                {copied ? t("preview.copied") : t("preview.copy")}
+              </button>
+            </div>
             <div className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
               <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                 <ChannelBadge channel={(channel || initialChannel || "Instagram") as Post["channel"]} />
