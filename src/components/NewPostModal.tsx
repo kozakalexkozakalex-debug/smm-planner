@@ -7,6 +7,7 @@ import { addPost, updatePost } from "@/lib/posts";
 import { toISOFromLocal } from "@/lib/dates";
 import { getSettings } from "@/lib/settings";
 import ChannelSelect from "@/components/ChannelSelect";
+import ChannelBadge from "@/components/ChannelBadge";
 import { t } from "@/lib/i18n";
 
 type Props = {
@@ -285,7 +286,7 @@ export default function NewPostModal({
           </div>
 
           <div className="mt-2">
-            <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Preview</div>
+            <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{t("preview.title")}</div>
             <div className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
               <div className="text-xs text-zinc-500 dark:text-zinc-400">
                 {(channel || initialChannel) || "—"} • {(dateTime || initialLocalDateTime) || "—"}

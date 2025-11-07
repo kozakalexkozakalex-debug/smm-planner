@@ -7,6 +7,7 @@ import { getPosts, updatePost, deletePost } from "@/lib/posts";
 import { formatDateYMD, toISOFromLocal } from "@/lib/dates";
 import { getSettings } from "@/lib/settings";
 import ChannelSelect from "@/components/ChannelSelect";
+import ChannelBadge from "@/components/ChannelBadge";
 import { STATUSES } from "@/lib/data";
 import Link from "next/link";
 import Toast from "@/components/Toast";
