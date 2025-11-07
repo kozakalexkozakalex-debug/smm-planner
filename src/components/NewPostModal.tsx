@@ -284,6 +284,17 @@ export default function NewPostModal({
             />
           </div>
 
+          <div className="mt-2">
+            <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Preview</div>
+            <div className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+              <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                {(channel || initialChannel) || "—"} • {(dateTime || initialLocalDateTime) || "—"}
+              </div>
+              <div className="mt-1 truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{title || initialTitle || "Untitled"}</div>
+              <div className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-200">{content || initialContent || ""}</div>
+            </div>
+          </div>
+
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"

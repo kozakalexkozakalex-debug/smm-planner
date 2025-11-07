@@ -158,7 +158,16 @@ export default function PostDetailsPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2 pt-2">
+        <div className="flex flex-col gap-4">
+          <div>
+            <div className="text-sm font-medium text-zinc-700 dark:text-zinc-200">Preview</div>
+            <div className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+              <div className="text-xs text-zinc-500 dark:text-zinc-400">{channel || "—"} • {dateTime || "—"}</div>
+              <div className="mt-1 truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{title || "Untitled"}</div>
+              <div className="mt-2 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-200">{content || ""}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pt-2">
           <button type="button" onClick={onSave} disabled={!canSave || !canUpdate} className="btn-primary disabled:opacity-60" title={!canUpdate ? "Insufficient permissions" : undefined}>
             Save
           </button>
@@ -180,6 +189,7 @@ export default function PostDetailsPage() {
           >
             Delete
           </button>
+          </div>
         </div>
         </div>
       )}
