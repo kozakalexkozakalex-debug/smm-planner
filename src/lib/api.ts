@@ -72,4 +72,17 @@ export const api = {
   {
     return req<{ plan: string; status: string; currentPeriodEnd?: string }>("/subscriptions");
   },
+  // Integrations
+  async getTelegram(): Promise<{ connected: boolean; chatId?: string | null }>
+  {
+    return req<{ connected: boolean; chatId?: string | null }>("/integrations/telegram");
+  },
+  async connectTelegram(botToken: string, chatId: string): Promise<{ ok: boolean; connected: boolean }>
+  {
+    return req<{ ok: boolean; connected: boolean }>("/integrations/telegram", { method: "POST", body: JSON.stringify({ botToken, chatId }) });
+  },
+  async disconnectTelegram(): Promise<{ ok: boolean }>
+  {
+    return req<{ ok: boolean }>("/integrations/telegram", { method: "DELETE" });
+  },
 };

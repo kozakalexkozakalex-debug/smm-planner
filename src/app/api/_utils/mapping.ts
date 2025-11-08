@@ -48,6 +48,7 @@ export function postToClient(p: any): ClientPost {
     channel: (p.channel?.name || "Instagram") as ClientPost["channel"],
     title: p.title || "",
     body: p.body || "",
+    media: p.media || [],
     status: toClientStatus(p.status),
   } as ClientPost;
 }

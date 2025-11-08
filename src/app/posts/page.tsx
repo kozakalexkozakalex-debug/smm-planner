@@ -57,7 +57,7 @@ function PostsPageInner() {
   const [sortKey, setSortKey] = useState<SortKey>(validSort);
   const [sortDir, setSortDir] = useState<SortDir>(validDir);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [prefill, setPrefill] = useState<{ local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"]; content?: string }>({});
+  const [prefill, setPrefill] = useState<{ local?: string; channel?: Post["channel"]; title?: string; status?: Post["status"]; content?: string; media?: string[] }>({});
   const [open, setOpen] = useState(false);
   const [undo, setUndo] = useState<{ show: boolean; post?: Post }>({ show: false });
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -200,6 +200,7 @@ function PostsPageInner() {
       channel: p.channel,
       title: p.title,
       content: (p as any).body || "",
+      media: (p as any).media || [],
       status: p.status,
     });
     setOpen(true);
@@ -316,6 +317,7 @@ function PostsPageInner() {
         initialChannel={prefill.channel}
         initialTitle={prefill.title}
         initialStatus={prefill.status}
+        initialMedia={prefill.media}
         initialContent={prefill.content}
       />
 

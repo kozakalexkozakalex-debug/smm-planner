@@ -52,8 +52,16 @@ export default function ImportExport({ onImported, onError }: Props) {
 
   function handleExportCSV() {
     const rows = [
-      ["id", "date", "channel", "title", "body", "status"],
-      ...getPosts().map((p) => [p.id, p.date, p.channel, p.title, (p as any).body || "", p.status]),
+      ["id", "date", "channel", "title", "body", "status", "media"],
+      ...getPosts().map((p) => [
+        p.id,
+        p.date,
+        p.channel,
+        p.title,
+        (p as any).body || "",
+        p.status,
+        Array.isArray((p as any).media) ? (p as any).media.join(";") : "",
+      ]),
     ];
     const csv = rows.map((r) => r.map((v) => escapeCsv(String(v))).join(",")).join("\n");
     downloadBlob(csv, "posts-export.csv", "text/csv;charset=utf-8");
@@ -124,6 +132,7 @@ export default function ImportExport({ onImported, onError }: Props) {
       title: header.indexOf("title"),
       body: header.indexOf("body"),
       status: header.indexOf("status"),
+      media: header.indexOf("media"),
     };
     if (idx.date === -1 || idx.channel === -1 || idx.title === -1 || idx.status === -1) return null;
     const channels = new Set<string>([...CHANNELS]);
@@ -137,10 +146,17 @@ export default function ImportExport({ onImported, onError }: Props) {
       const title = cols[idx.title];
       const status = cols[idx.status] as Post["status"];
       const body = idx.body !== -1 ? cols[idx.body] : "";
+      const mediaStr = idx.media !== -1 ? cols[idx.media] : "";
+      const media = mediaStr
+        ? mediaStr
+            .split(";")
+            .map((s) => s.trim())
+            .filter((s) => !!s)
+        : [];
       if (!date || !title || !channels.has(channel) || !statuses.has(status)) continue;
       const d = new Date(date);
       if (Number.isNaN(d.getTime())) continue;
-      list.push({ id: id || generateId(), date: d.toISOString(), channel, title, body, status } as Post);
+      list.push({ id: id || generateId(), date: d.toISOString(), channel, title, body, status, media } as Post);
     }
     return list.length ? list : null;
   }

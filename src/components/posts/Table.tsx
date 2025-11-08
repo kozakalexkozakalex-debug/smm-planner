@@ -85,7 +85,7 @@ export default function PostsTable({
   }
   function renderHeader(label: string, key: SortKey) {
     const isActive = sortKey === key;
-    const arrow = !isActive ? "↕" : sortDir === "asc" ? "▲" : "▼";
+    const arrow = !isActive ? "Р Р†РІР‚В РІР‚Сћ" : sortDir === "asc" ? "Р Р†РІР‚вЂњР вЂ " : "Р Р†РІР‚вЂњРЎВ";
     return (
       <button
         type="button"
@@ -138,7 +138,7 @@ export default function PostsTable({
                         {t("table.clearFilters")}
                       </button>
                     )}
-                    <button type="button" onClick={onCreate} className="btn-primary disabled:opacity-50" disabled={!canCreate} title={!canCreate ? (createDisabled ? t("error.quotaPostsExceeded") : "Insufficient permissions") : undefined}>
+                    <button type="button" onClick={onCreate} className="btn-primary disabled:opacity-50" disabled={!canCreate} title={!canCreate ? (createDisabled ? t("error.quotaPostsExceeded") : t("rbac.cannotCreate")) : undefined}>
                       {hasActiveFilters ? t("table.newPost") : t("table.createPost")}
                     </button>
                   </div>
@@ -198,10 +198,11 @@ export default function PostsTable({
                       onChange={(e) => onUpdateStatus(p.id, e.target.value as Post["status"])}
                       className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs text-zinc-900 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                       disabled={!canUpdate}
+                      title={!canUpdate ? t("rbac.cannotUpdate") : undefined}
                     >
-                      <option value="Draft">Draft</option>
-                      <option value="Scheduled">Scheduled</option>
-                      <option value="Published">Published</option>
+                      <option value="Draft">{t("status.Draft")}</option>
+                      <option value="Scheduled">{t("status.Scheduled")}</option>
+                      <option value="Published">{t("status.Published")}</option>
                     </select>
                   </div>
                 </td>
@@ -214,7 +215,7 @@ export default function PostsTable({
                         className="rounded-md bg-emerald-600 px-2 py-1 text-xs text-white hover:bg-emerald-500 disabled:opacity-50"
                         aria-label={`Publish post ${p.title}`}
                         disabled={!canPublish}
-                        title={!canPublish ? "Insufficient permissions" : undefined}
+                        title={!canPublish ? t("rbac.cannotPublish") : undefined}
                       >
                         {t("action.publish")}
                       </button>
@@ -225,7 +226,7 @@ export default function PostsTable({
                       className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                       aria-label={`Edit post ${p.title}`}
                       disabled={!canUpdate}
-                      title={!canUpdate ? "Insufficient permissions" : undefined}
+                      title={!canUpdate ? t("rbac.cannotUpdate") : undefined}
                     >
                       {t("action.edit")}
                     </button>
@@ -236,7 +237,7 @@ export default function PostsTable({
                         className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                         aria-label={`Quick edit post ${p.title}`}
                         disabled={!canUpdate}
-                        title={!canUpdate ? "Insufficient permissions" : undefined}
+                        title={!canUpdate ? t("rbac.cannotUpdate") : undefined}
                       >
                         {t("action.quickEdit")}
                       </button>
@@ -247,7 +248,7 @@ export default function PostsTable({
                       className="rounded-md border border-zinc-300 bg-white px-2 py-1 text-xs hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                       aria-label={`Duplicate post ${p.title}`}
                       disabled={!canCreate}
-                      title={!canCreate ? (createDisabled ? t("error.quotaPostsExceeded") : "Insufficient permissions") : undefined}
+                      title={!canCreate ? (createDisabled ? t("error.quotaPostsExceeded") : t("rbac.cannotCreate")) : undefined}
                     >
                       {t("action.duplicate")}
                     </button>

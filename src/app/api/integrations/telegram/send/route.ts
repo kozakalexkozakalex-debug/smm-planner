@@ -20,8 +20,13 @@ export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as Payload;
 
   // Prefer request-provided credentials; fallback to server env for quick testing
-  const token = body.token || process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = body.chatId || process.env.TELEGRAM_CHAT_ID;
+  let token = body.token || process.env.TELEGRAM_BOT_TOKEN;
+  let chatId = body.chatId || process.env.TELEGRAM_CHAT_ID;
+  if (prisma && (!token || !chatId)) {
+    const row = await prisma.socialConnection.findFirst({ where: { workspaceId: ws, platform: "TELEGRAM" } });
+    token = token || (row?.accessToken as string | undefined);
+    chatId = chatId || (row?.externalId as string | undefined);
+  }
   if (!token || !chatId) {
     return NextResponse.json({ ok: false, error: "Missing token/chatId" }, { status: 400 });
   }

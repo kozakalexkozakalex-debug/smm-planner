@@ -115,6 +115,7 @@ model Post {
   channelId   String?
   title       String
   body        String?
+  media       Json?
   status      PostStatus @default(DRAFT)
   scheduledAt DateTime?
   publishedAt DateTime?

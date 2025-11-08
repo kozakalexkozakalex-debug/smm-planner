@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -154,22 +154,24 @@ export default function Navbar() {
             {t("navbar.members")}
           </Link>
           <div className="ml-2 inline-flex items-center gap-1 text-xs">
-            <button
-              type="button"
-              onClick={() => switchLocale("en")}
-              className={`rounded px-2 py-1 ${locale === "en" ? "bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900" : "border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"}`}
-              aria-pressed={locale === "en"}
+            <label htmlFor="lang" className="sr-only">Language</label>
+            <select
+              id="lang"
+              value={locale}
+              onChange={(e) => switchLocale(e.target.value as Locale)}
+              className="h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              aria-label="Language"
             >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => switchLocale("uk")}
-              className={`rounded px-2 py-1 ${locale === "uk" ? "bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900" : "border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"}`}
-              aria-pressed={locale === "uk"}
-            >
-              UK
-            </button>
+              <option value="uk">Українська</option>
+              <option value="en">English</option>
+              <option disabled>—</option>
+              <option value="pl">Polski</option>
+              <option value="de">Deutsch</option>
+              <option value="es">EspaГ±ol</option>
+              <option value="fr">FranГ§ais</option>
+              <option value="it">Italiano</option>
+              <option value="pt">Portugues</option>
+            </select>
           </div>
           <div className="ml-4 inline-flex items-center gap-2">
             <label htmlFor="ws" className="sr-only">Workspace</label>

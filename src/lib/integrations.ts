@@ -1,4 +1,5 @@
 "use client";
+import { api } from "@/lib/api";
 
 type Telegram = {
   connected: boolean;
@@ -37,14 +38,19 @@ export function subscribeTelegram(fn: Listener): () => void {
   listeners.add(fn);
   return () => listeners.delete(fn);
 }
-export function connectTelegram(botToken: string, chatId: string) {
-  telegram = { connected: true, botToken, chatId };
+export async function connectTelegram(botToken: string, chatId: string) {
+  try {
+    await api.connectTelegram(botToken, chatId);
+    telegram = { connected: true, chatId };
+  } catch {
+    telegram = { connected: true, botToken, chatId };
+  }
   save();
   notify();
 }
-export function disconnectTelegram() {
+export async function disconnectTelegram() {
+  try { await api.disconnectTelegram(); } catch {}
   telegram = { connected: false };
   save();
   notify();
 }
-
