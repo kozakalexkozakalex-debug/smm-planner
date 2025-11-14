@@ -1,0 +1,129 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { getPosts, subscribe } from "@/lib/posts";
+import { buildMonthGrid, monthLabel, formatDateYMD } from "@/lib/dates";
+import { getSettings, subscribeSettings } from "@/lib/settings";
+import type { Post } from "@/lib/types";
+
+type Props = {
+  onSelectDate?: (ymd: string) => void;
+};
+
+export default function MonthCalendar({ onSelectDate }: Props) {
+  const [anchor, setAnchor] = useState<Date>(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+  const [counts, setCounts] = useState<Map<string, { Draft: number; Scheduled: number; Published: number }>>(new Map());
+  const [timezone, setTimezone] = useState<string>(() => getSettings().timezone);
+
+  useEffect(() => {
+    const compute = () => {
+      const map = new Map<string, { Draft: number; Scheduled: number; Published: number }>();
+      const tz = timezone || undefined;
+      for (const p of getPosts()) {
+        const ymd = formatDateYMD(p.date, tz);
+        if (!ymd) continue;
+        const bucket = map.get(ymd) ?? { Draft: 0, Scheduled: 0, Published: 0 };
+        bucket[p.status as Post["status"]] += 1;
+        map.set(ymd, bucket);
+      }
+      setCounts(map);
+    };
+    compute();
+    const unsubPosts = subscribe(compute);
+    const unsubSettings = subscribeSettings(() => setTimezone(getSettings().timezone));
+    return () => {
+      unsubPosts();
+      unsubSettings();
+    };
+  }, [timezone]);
+
+  const cells = useMemo(() => buildMonthGrid(anchor, 1), [anchor]);
+
+  function prevMonth() {
+    setAnchor((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
+  }
+  function nextMonth() {
+    setAnchor((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1));
+  }
+
+  return (
+    <div className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="mb-3 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={prevMonth}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+          aria-label="Previous month"
+        >
+          ←
+        </button>
+        <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          {monthLabel(anchor)}
+        </div>
+        <button
+          type="button"
+          onClick={nextMonth}
+          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+          aria-label="Next month"
+        >
+          →
+        </button>
+      </div>
+      <div className="grid grid-cols-7 gap-1 text-center text-xs text-zinc-500 dark:text-zinc-400">
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+        <div>Sun</div>
+      </div>
+      <div className="mt-2 grid grid-cols-7 gap-1">
+        {cells.map((c, idx) => {
+          const bucket = counts.get(c.ymd) ?? { Draft: 0, Scheduled: 0, Published: 0 };
+          const total = bucket.Draft + bucket.Scheduled + bucket.Published;
+          const muted = c.inCurrentMonth ? "" : "opacity-40";
+          return (
+            <button
+              type="button"
+              key={`${c.ymd}-${idx}`}
+              onClick={() => onSelectDate?.(c.ymd)}
+              aria-label={`${c.ymd} — ${total} posts`}
+              className={`h-20 rounded-md border border-zinc-200 p-2 text-left hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900/60 ${muted}`}
+            >
+              <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                {c.date.getDate()}
+              </div>
+              <div className="mt-2 flex items-center gap-1">
+                {bucket.Draft > 0 && <span className="h-2 w-2 rounded-full bg-zinc-400" aria-label="Draft" />}
+                {bucket.Scheduled > 0 && (
+                  <span className="h-2 w-2 rounded-full bg-amber-500" aria-label="Scheduled" />
+                )}
+                {bucket.Published > 0 && (
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" aria-label="Published" />
+                )}
+                {total > 0 && (
+                  <span className="ml-1 text-[10px] text-zinc-500 dark:text-zinc-400">{total}</span>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <div className="mt-3 flex items-center gap-3 text-[10px] text-zinc-500 dark:text-zinc-400">
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-zinc-400" /> Draft
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-amber-500" /> Scheduled
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-emerald-500" /> Published
+        </span>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,192 @@
+// Prisma schema for SMM Planner core entities
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  APPROVED
+  PUBLISHED
+}
+
+enum Platform {
+  TELEGRAM
+  INSTAGRAM
+  FACEBOOK
+  TIKTOK
+  YOUTUBE
+  X
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String?
+  createdAt DateTime  @default(now())
+  members   Member[]
+  posts     Post[]    @relation("PostAuthor")
+  audits    AuditLog[] @relation("AuditActor")
+  ownedWorkspaces Workspace[] @relation("UserOwnedWorkspaces")
+}
+
+model Workspace {
+  id          String     @id @default(uuid())
+  name        String
+  ownerId     String
+  owner       User       @relation("UserOwnedWorkspaces", fields: [ownerId], references: [id])
+  members     Member[]
+  channels    Channel[]
+  posts       Post[]
+  subs        Subscription[]
+  usages      UsageCounter[]
+  audits      AuditLog[]
+  brandKits   BrandKit[]
+  connections SocialConnection[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Member {
+  userId      String
+  workspaceId String
+  role        Role       @default(VIEWER)
+  user        User       @relation(fields: [userId], references: [id])
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id])
+  createdAt   DateTime   @default(now())
+
+  @@id([userId, workspaceId])
+}
+
+model BrandKit {
+  id          String    @id @default(uuid())
+  workspaceId String
+  logoUrl     String?
+  colors      Json?
+  fonts       Json?
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Channel {
+  id          String    @id @default(uuid())
+  workspaceId String
+  name        String
+  platform    Platform?
+  externalId  String?
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  posts       Post[]
+
+  @@unique([workspaceId, name])
+}
+
+model SocialConnection {
+  id           String    @id @default(uuid())
+  workspaceId  String
+  platform     Platform
+  externalId   String?
+  accessToken  String?
+  refreshToken String?
+  meta         Json?
+  revokedAt    DateTime?
+  workspace    Workspace @relation(fields: [workspaceId], references: [id])
+  createdAt    DateTime  @default(now())
+
+  @@unique([workspaceId, platform, externalId])
+}
+
+model Post {
+  id          String     @id @default(uuid())
+  workspaceId String
+  channelId   String?
+  title       String
+  body        String?
+  media       Json?
+  status      PostStatus @default(DRAFT)
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  authorId    String?
+  author      User?      @relation("PostAuthor", fields: [authorId], references: [id])
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id])
+  channel     Channel?   @relation(fields: [channelId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  schedules   Schedule[]
+}
+
+model Schedule {
+  id        String     @id @default(uuid())
+  postId    String     @unique
+  runAt     DateTime
+  status    String     @default("pending")
+  attempts  Int        @default(0)
+  lastError String?
+  post      Post       @relation(fields: [postId], references: [id])
+}
+
+model Plan {
+  code       String       @id
+  name       String
+  priceCents Int
+  period     String       // e.g., month, year
+  entitlements Entitlement[]
+  subscriptions Subscription[]
+}
+
+model Entitlement {
+  id       String @id @default(uuid())
+  planCode String
+  key      String
+  limit    Int?
+  plan     Plan   @relation(fields: [planCode], references: [code])
+}
+
+model Subscription {
+  id               String    @id @default(uuid())
+  workspaceId      String
+  planCode         String
+  stripeCustomerId String?
+  status           String
+  currentPeriodEnd DateTime?
+  trialEnd         DateTime?
+  workspace        Workspace @relation(fields: [workspaceId], references: [id])
+  plan             Plan      @relation(fields: [planCode], references: [code])
+}
+
+model UsageCounter {
+  id          String    @id @default(uuid())
+  workspaceId String
+  key         String
+  month       String    // YYYY-MM
+  used        Int       @default(0)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, key, month])
+}
+
+model AuditLog {
+  id          String    @id @default(uuid())
+  workspaceId String
+  actorId     String?
+  action      String
+  entity      String
+  entityId    String
+  meta        Json?
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  actor       User?     @relation("AuditActor", fields: [actorId], references: [id])
+}
